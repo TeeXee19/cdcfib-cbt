@@ -7,8 +7,6 @@ import Logo from "@/assets/logo.png";
 import HomeIcon from "@/assets/homeIcon.png";
 import PaymentIcon from "@/assets/paymentIcon.png";
 import TenantIcon from "@/assets/tenantIcon.png";
-import UnitIcon from "@/assets/unitIcon.png";
-import PropertyIcon from "@/assets/propertyIcon.png";
 
 interface SidebarProps {
   sidebarOpen: boolean;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ExamineeCard from '@/components/molecules/ExamineeCard';
+import ExamineeCard from '../../components/molecules/ExamineeCard';
 // Assuming a custom hook or function for routing/redirection
 // import { useNavigate } from 'react-router-dom'; 
 

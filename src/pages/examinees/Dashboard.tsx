@@ -13,13 +13,13 @@ const rawQuestions = [
     { id: 10, type: "boolean", text: "Water boils at 100°C." },
 ];
 
-const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
+const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
 const ExamInterface = ({ userName = "TOCHUKWU" }) => {
     const EXAM_DURATION = 60 * 60; // 60 minutes in seconds
     const [examStarted, setExamStarted] = useState(false);
-    const [questions, setQuestions] = useState([]);
-    const [answers, setAnswers] = useState({});
+    const [questions, setQuestions] = useState<any[]>([]);
+    const [answers, setAnswers] = useState<Record<number, any>>({});
     const [submitted, setSubmitted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(EXAM_DURATION);
     const [currentPage, setCurrentPage] = useState(0);
@@ -71,8 +71,8 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
 
     // Disable inspect tools
     useEffect(() => {
-        const blockRightClick = (e) => e.preventDefault();
-        const blockKeys = (e) => {
+        const blockRightClick = (e: MouseEvent) => e.preventDefault();
+        const blockKeys = (e: KeyboardEvent) => {
             if (
                 e.key === "F12" ||
                 (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key)) ||
@@ -96,19 +96,19 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
         }
     }, [examStarted]);
 
-    const formatTime = (seconds) => {
+    const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     };
 
-    const handleAnswer = (questionId, value) => {
+    const handleAnswer = (questionId: number, value: any) => {
         const updated = { ...answers, [questionId]: value };
         setAnswers(updated);
         localStorage.setItem("examAnswers", JSON.stringify(updated));
     };
 
-    const goToPage = (page) => {
+    const goToPage = (page: number) => {
         setCurrentPage(page);
         localStorage.setItem("examPage", page.toString());
     };
@@ -204,7 +204,7 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
 
                                 {q.type === "single" && (
                                     <div className="space-y-2">
-                                        {q.options.map((opt) => (
+                                        {q.options.map((opt: string) => (
                                             <label key={opt} className="flex items-center gap-2">
                                                 <input
                                                     type="radio"
@@ -223,7 +223,7 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
 
                                 {q.type === "multiple" && (
                                     <div className="space-y-2">
-                                        {q.options.map((opt) => (
+                                        {q.options.map((opt: string) => (
                                             <label key={opt} className="flex items-center gap-2">
                                                 <input
                                                     type="checkbox"
@@ -233,7 +233,7 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
                                                         const prev = answers[q.id] || [];
                                                         const updated = e.target.checked
                                                             ? [...prev, opt]
-                                                            : prev.filter((o) => o !== opt);
+                                                            : prev.filter((o: string) => o !== opt);
                                                         handleAnswer(q.id, updated);
                                                     }}
                                                     className="accent-green-600"

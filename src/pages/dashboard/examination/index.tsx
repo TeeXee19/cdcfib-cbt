@@ -34,7 +34,7 @@ const ExamDashboard = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [editExam, setEditExam] = useState<any>(null);
-  const [editErrors, setEditErrors] = useState({});
+  const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
   const handleSubmit = async () => {
@@ -53,6 +53,7 @@ const ExamDashboard = () => {
         body: formData,
       });
       const result = await response.json();
+      console.log("Exam created/updated:", result);
       toast.success(editingId ? "Exam updated successfully!" : "Exam created successfully!");
 
       const newExam = {

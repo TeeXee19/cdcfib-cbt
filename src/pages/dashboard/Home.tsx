@@ -13,9 +13,9 @@ const categoryBreakdown = [
 
 const ExamSummaryDashboard = () => {
   const [exams, setExams] = useState(initialExams);
-  const [confirmModal, setConfirmModal] = useState({ show: false, action: "", examId: null });
+  const [confirmModal, setConfirmModal] = useState<any>({ show: false, action: "", examId: null });
 
-  const handleConfirm = (action, examId) => {
+  const handleConfirm = (action: string, examId: number) => {
     setConfirmModal({ show: true, action, examId });
   };
 
@@ -78,7 +78,7 @@ const ExamSummaryDashboard = () => {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{exam.date} • {exam.time}</p>
               </div>
               <div className="flex items-center gap-4">
-                <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColors[exam.status]}`}>
+                <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColors[exam.status as keyof typeof statusColors]}`}>
                   {exam.status.charAt(0).toUpperCase() + exam.status.slice(1)}
                 </span>
                 {exam.status === "scheduled" && (

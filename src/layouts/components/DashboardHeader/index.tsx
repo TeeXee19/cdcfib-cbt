@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 // import DropdownNotification from './DropdownNotification';
 // import DropdownUser from './DropdownUser';
 import LogoIcon from "@/assets/logo.png";
-import DarkModeSwitcher from './DarkModeSwitcher';
 
 const DashboardHeader = (props: {
   sidebarOpen: string | boolean | undefined;
