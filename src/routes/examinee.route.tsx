@@ -12,7 +12,7 @@ const siteRouter: RouteObject[] = [
     path: "/",
     element: <AUTH />,
   },{
-    path: "/dashboard",
+    path: "/exam",
     element: <DASHBOARD />,
   },
 
