@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useCreateExam } from "../../../hooks/useExam";
 
 const ExamDashboard = () => {
+
+
+  const {data:payload} = useCreateExam()
   const [exams, setExams] = useState([
     {
       id: 1,
