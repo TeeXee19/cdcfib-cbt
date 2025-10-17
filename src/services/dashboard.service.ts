@@ -1,9 +1,9 @@
 import APIs from "../constants/APIs";
-import { BorderPointData, MovementDirectionCount, MovementMonthlyCounts, ResidenceCountryStat } from "../types/apiResponse";
+import { ExamSummary } from "../types/dashboard.dto";
 import { sendRequest } from "./axios.service";
 
-export async function cardCounts(
-): Promise<MovementDirectionCount[]> {
+export async function dashboard(
+): Promise<ExamSummary> {
     const result = await sendRequest(
         "GET",
         `${APIs.DASHBOARD}`,
@@ -14,65 +14,7 @@ export async function cardCounts(
         }
     );
 
-    if (result?.statusCode != 200) {
-        throw new Error(result?.data ?? result?.message);
-    }
-    return result.data;
-}
-
-export async function movementCounts(
-    startDate?:any,
-    endDate?: any
-): Promise<MovementMonthlyCounts[]> {
-    const result = await sendRequest(
-        "GET",
-        `${APIs.DASHBOARD}/direction`,
-        "",
-        true,
-        {},
-        {
-            startDate,
-            endDate
-        }
-    );
-
-    if (result?.statusCode != 200) {
-        throw new Error(result?.data ?? result?.message);
-    }
-    return result.data;
-}
-
-export async function movementBorderCount(
-): Promise<BorderPointData[]> {
-    const result = await sendRequest(
-        "GET",
-        `${APIs.DASHBOARD}/direction/border`,
-        "",
-        true,
-        {},
-        {
-        }
-    );
-
-    if (result?.statusCode != 200) {
-        throw new Error(result?.data ?? result?.message);
-    }
-    return result.data;
-}
-
-export async function nationalityCount(
-): Promise<ResidenceCountryStat[]> {
-    const result = await sendRequest(
-        "GET",
-        `${APIs.DASHBOARD}/natianality`,
-        "",
-        true,
-        {},
-        {
-        }
-    );
-
-    if (result?.statusCode != 200) {
+    if (result?.status != 'success') {
         throw new Error(result?.data ?? result?.message);
     }
     return result.data;

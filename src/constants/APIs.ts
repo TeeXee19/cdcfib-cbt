@@ -1,5 +1,5 @@
 export default {
-    LOGIN: 'auth/login',
+    LOGIN: 'identity/access',
     SIGNUP: 'auth/register',
     ACTIVATE_ACCOUNT: 'auth/activate',
     FORGOT_PASSWORD: 'auth/forgot-password',
@@ -10,5 +10,6 @@ export default {
     TRAVELLER:'travellers',
     ROLE:'role',
     EXAM:'exams',
-    QUESTION:'questions'
+    QUESTION:'questions',
+    EXAMINEE:'examinees'
 }

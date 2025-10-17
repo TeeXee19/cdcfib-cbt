@@ -1,4 +1,5 @@
 import  { useState } from "react";
+import { useExamineeListQuery } from "../../../hooks/useExamineeHooks";
 
 const CandidateExamStatus = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -8,6 +9,8 @@ const CandidateExamStatus = () => {
   const [sortField, setSortField] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const rowsPerPage = 5;
+
+  const {data:examinee, isLoading:pending} = useExamineeListQuery(0, 20, '', 'id', 'desc')
 
   const [data] = useState([
     {
@@ -140,10 +143,10 @@ const CandidateExamStatus = () => {
             </tr>
           </thead>
           <tbody>
-            {paginated.map((row, index) => (
+            {examinee?.data.map((row, index) => (
               <tr key={index} className="border-t border-gray-300 dark:border-gray-700">
-                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.candidate}</td>
-                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.exam}</td>
+                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.candidate_number}{}</td>
+                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.candidate_type}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -157,9 +160,9 @@ const CandidateExamStatus = () => {
                     {row.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.timeLeft}</td>
-                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.lastSync}</td>
-                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.type}</td>
+                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.time_left || 0}</td>
+                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.created_at}</td>
+                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.candidate_type}</td>
               </tr>
             ))}
           </tbody>

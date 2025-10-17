@@ -12,7 +12,7 @@ import { sendRequest } from "./axios.service";
 export async function login(payload: LoginType) {
   // const response = await axiosApi.post(APIs.LOGIN, payload)
   const result = await sendRequest("POST", APIs.LOGIN, payload, false);
-  if (result?.statusCode != 200) {
+  if (result?.status != 'success') {
     throw new Error(result?.data ?? result?.message);
   }
   return result.data;
@@ -20,7 +20,7 @@ export async function login(payload: LoginType) {
 
 export async function signUp(payload: SignupType) {
   const result = await sendRequest("POST", APIs.SIGNUP, payload);
-  if (result?.statusCode != 200) {
+  if (result?.status != 'success') {
     throw new Error(result?.data ?? result?.message);
   }
   return result.data;
@@ -28,7 +28,7 @@ export async function signUp(payload: SignupType) {
 
 export async function forgotPassword(payload: ForgotPasswordType) {
   const result = await sendRequest("POST", APIs.FORGOT_PASSWORD, payload);
-  if (result?.statusCode != 200) {
+  if (result?.status != 'success') {
     throw new Error(result?.data ?? result?.message);
   }
   return result.data;
@@ -36,7 +36,7 @@ export async function forgotPassword(payload: ForgotPasswordType) {
 
 export async function resetPassword(payload: ResetPasswordType) {
   const result = await sendRequest("POST", APIs.RESET_PASSWORD, payload);
-  if (result?.statusCode != 200) {
+  if (result?.status != 'success') {
     throw new Error(result?.data ?? "Invalid API response");
   }
   return result.data;
@@ -45,14 +45,14 @@ export async function resetPassword(payload: ResetPasswordType) {
 
 export async function verifyEmail(token: string) {
   const result = await sendRequest("GET", `${APIs.ACTIVATE_ACCOUNT}/${token}`);
-  if (result?.statusCode != 200) {
+  if (result?.status != 'success') {
     throw new Error(result?.data ?? result?.message);
   }
   return result.data;
 }
 export async function verifyToken(payload:VerificationDto):Promise<AuthData> {
   const result = await sendRequest("POST", `${APIs.VERIFY_TOKEN}`, payload);
-  if (result?.statusCode != 200) {
+  if (result?.status != 'success') {
     throw new Error(result?.data ?? result?.message);
   }
   return result.data;

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDashboardQuery } from "../../hooks/dashboard.hooks";
+import { useExamListQuery } from "../../hooks/useExam";
 
 const initialExams = [
   { id: 1, title: "Commissioned Test", date: "Oct 15, 2025", time: "10:00 AM", status: "scheduled" },
@@ -12,37 +14,59 @@ const categoryBreakdown = [
 ];
 
 const ExamSummaryDashboard = () => {
-  const [exams, setExams] = useState(initialExams);
+  // const [exams, setExams] = useState(initialExams);
   const [confirmModal, setConfirmModal] = useState<any>({ show: false, action: "", examId: null });
+
+  const { data: summary } = useDashboardQuery()
 
   const handleConfirm = (action: string, examId: number) => {
     setConfirmModal({ show: true, action, examId });
   };
 
-  const executeAction = () => {
-    const { action, examId } = confirmModal;
-    setExams((prev) =>
-      prev.map((exam) =>
-        exam.id === examId ? { ...exam, status: action === "start" ? "active" : "completed" } : exam
-      )
-    );
-    setConfirmModal({ show: false, action: "", examId: null });
-  };
-
-  const totalExams = exams.length;
-  const activeExams = exams.filter((e) => e.status === "active").length;
-  const completedExams = exams.filter((e) => e.status === "completed").length;
+  // const executeAction = () => {
+  //   const { action, examId } = confirmModal;
+  //   setExams((prev) =>
+  //     prev.map((exam) =>
+  //       exam.id === examId ? { ...exam, status: action === "start" ? "active" : "completed" } : exam
+  //     )
+  //   );
+  //   setConfirmModal({ show: false, action: "", examId: null });
+  // };
+  const {data:exams} = useExamListQuery(0, 10, '', 'id', 'asc')
 
   const examStats = [
-    { label: "Total Exams", value: totalExams, icon: "📚", color: "bg-blue-100 text-blue-800" },
-    { label: "Registered Candidates", value: 250, icon: "🧑‍🎓", color: "bg-green-100 text-green-800" },
-    { label: "Active Exams", value: activeExams, icon: "🟢", color: "bg-yellow-100 text-yellow-800" },
-    { label: "Results Synced", value: "80%", icon: "✅", color: "bg-purple-100 text-purple-800" },
-    { label: "Completed Exams", value: completedExams, icon: "📦", color: "bg-indigo-100 text-indigo-800" },
+    {
+      label: "Total Exams",
+      value: summary?.exam_counts.reduce((r, s) => r + s.total, 0) ?? 0,
+      icon: "📚",
+      color: "bg-blue-100 text-blue-800"
+    },
+    { 
+      label: "Registered Candidates", 
+      value: summary?.total_examinee, icon: "🧑‍🎓", 
+      color: "bg-green-100 text-green-800" 
+    },
+    { 
+      label: "Active Exams", 
+      value: summary?.exam_counts.find(f=>f.status == 'active')?.total,
+      icon: "🟢", 
+      color: "bg-yellow-100 text-yellow-800" 
+    },
+    { 
+      label: "Results Synced", 
+      value: "80%", 
+      icon: "✅", 
+      color: "bg-purple-100 text-purple-800" 
+    },
+    { label: "Completed Exams", value: summary?.exam_counts.find(r=>r.status == 'completed')?.total, icon: "📦", color: "bg-indigo-100 text-indigo-800" },
     { label: "Pending Submissions", value: 12, icon: "⏳", color: "bg-red-100 text-red-800" },
     // { label: "Pass Rate", value: "72%", icon: "📈", color: "bg-teal-100 text-teal-800" },
     { label: "Avg Completion Time", value: "42 min", icon: "⏱️", color: "bg-gray-100 text-gray-800" },
   ];
+
+  useEffect(() => {
+
+  }, [summary])
 
   const statusColors = {
     scheduled: "bg-yellow-100 text-yellow-800",
@@ -71,11 +95,11 @@ const ExamSummaryDashboard = () => {
       <div className="mb-10">
         <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">📋 Exam List</h3>
         <ul className="space-y-4">
-          {exams.map((exam) => (
+          {exams?.data.map((exam) => (
             <li key={exam.id} className="bg-white dark:bg-[#1A1B1F] p-4 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h4 className="font-semibold text-gray-800 dark:text-white">{exam.title}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{exam.date} • {exam.time}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{exam.start_date} • {exam.end_date}</p>
               </div>
               <div className="flex items-center gap-4">
                 <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColors[exam.status as keyof typeof statusColors]}`}>
@@ -126,7 +150,7 @@ const ExamSummaryDashboard = () => {
             </p>
             <div className="flex justify-center gap-4">
               <button
-                onClick={executeAction}
+                // onClick={executeAction}
                 className="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 rounded-lg"
               >
                 Yes, Confirm

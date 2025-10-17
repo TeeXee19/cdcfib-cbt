@@ -185,6 +185,18 @@ export interface IPersonsStopList {
   DoubtablePersons: IDoubtablePerson[];
 }
 
+
+export interface Meta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: Meta;
+}
 export type PersonsStopListResponse = IPersonsStopList[];
  
 
