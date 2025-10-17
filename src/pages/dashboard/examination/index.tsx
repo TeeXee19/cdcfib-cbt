@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
 import { handleInputChange, handleSubmitForm } from "../../../helpers/utils";
-import {ExamPayload } from "../../../types/exam.dto";
+import { ExamPayload } from "../../../types/exam.dto";
 
 const ExamDashboard = () => {
 
@@ -16,7 +16,7 @@ const ExamDashboard = () => {
     status: 'scheduled',
   });
 
-  const {data:exams} = useExamListQuery(0, 10, '', 'id', 'asc')
+  const { data: exams } = useExamListQuery(0, 10, '', 'id', 'asc')
 
   const { mutate: CreateExam } = useCreateExam();
 
@@ -151,48 +151,104 @@ const ExamDashboard = () => {
           <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             {editingId ? "✏️ Edit Exam" : "📝 Create New Exam"}
           </h3>
-          <form onSubmit={(e) => handleSubmitForm(CreateExam)(e, formData)}>
+          {/* <form onSubmit={(e) => handleSubmitForm(CreateExam)(e, formData)}>
 
-          </form>
+          </form> */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-            <input
-              type="text"
-              name="title"
-              placeholder="Exam Title"
-              value={formData.title}
-              onChange={(e) => handleInputChange(e, setFormData, formData)}
-              className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
-            />
+            {/* Exam Title */}
+            <div className="w-full">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                🏷️ Exam Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="Enter exam title"
+                value={formData.title}
+                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-            <input
-              type="number"
-              name="duration"
-              placeholder="Duration (minutes)"
-              value={formData.duration}
-              onChange={(e) => handleInputChange(e, setFormData, formData)}
-              className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
-            />
+            {/* Exam Type */}
+            <div className="w-full">
+              <label htmlFor="exam_type" className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                📝 Exam Type
+              </label>
+              <select
+                id="exam_type"
+                name="exam_type"
+                value={formData.exam_type}
+                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select type</option>
+                <option value="commissioned">Commissioned</option>
+                <option value="non_commissioned">Non Commissioned</option>
+              </select>
+            </div>
 
-            <input
-              type="datetime-local"
-              name="start_date"
-              value={formData.start_date}
-              onChange={(e) => handleInputChange(e, setFormData, formData)}
-              className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
-            />
+            {/* Duration */}
+            <div className="w-full">
+              <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                ⏳ Duration (minutes)
+              </label>
+              <input
+                type="number"
+                id="duration"
+                name="duration"
+                placeholder="e.g. 60"
+                value={formData.duration}
+                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-            <input
-              type="datetime-local"
-              name="end_date"
-              value={formData.end_date}
-              onChange={(e) => handleInputChange(e, setFormData, formData)}
-              className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
-            />
-            {questionFile && (
-              <p className="mt-2 text-sm text-green-600 dark:text-green-400">
-                Selected file: <strong>{questionFile.name}</strong>
-              </p>
-            )}
+            {/* Start Date */}
+            <div className="w-full">
+              <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                📅 Start Date
+              </label>
+              <input
+                type="datetime-local"
+                id="start_date"
+                name="start_date"
+                value={formData.start_date}
+                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* End Date */}
+            <div className="w-full">
+              <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                ⏰ End Date
+              </label>
+              <input
+                type="datetime-local"
+                id="end_date"
+                name="end_date"
+                value={formData.end_date}
+                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Questions File */}
+            <div className="w-full">
+              <label htmlFor="question_file" className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                📤 Questions File
+              </label>
+              <input
+                type="file"
+                id="question_file"
+                name="question_file"
+                accept=".csv,.xlsx"
+                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#2A2B2F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           <div className="flex justify-end">
