@@ -8,5 +8,7 @@ export default {
     USER: 'user',
     DASHBOARD: 'dashboard',
     TRAVELLER:'travellers',
-    ROLE:'role'
+    ROLE:'role',
+    EXAM:'exams',
+    QUESTION:'questions'
 }
