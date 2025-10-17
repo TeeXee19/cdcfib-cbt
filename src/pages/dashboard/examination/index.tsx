@@ -9,7 +9,7 @@ const ExamDashboard = () => {
 
   const [formData, setFormData] = useState<ExamPayload>({
     title: "",
-    description: "",
+    type: "",
     start_date: "",
     end_date: "",
     duration: 0,
@@ -41,7 +41,6 @@ const ExamDashboard = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [questionFile, setQuestionFile] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -51,6 +50,10 @@ const ExamDashboard = () => {
   const [editFile, setEditFile] = useState<File | null>(null);
 
 
+
+  function setQuestionFile(arg0: null) {
+    throw new Error("Function not implemented.");
+  }
 
   // const handleEdit = (id: number) => {
   //   const exam = exams.find((e) => e.id === id);
@@ -178,8 +181,8 @@ const ExamDashboard = () => {
               </label>
               <select
                 id="exam_type"
-                name="exam_type"
-                value={formData.exam_type}
+                name="type"
+                value={formData.type}
                 onChange={(e) => handleInputChange(e, setFormData, formData)}
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
