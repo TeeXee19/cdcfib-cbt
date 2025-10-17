@@ -2,11 +2,14 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam } from "../../../hooks/useExam";
+import { handleInputChange, handleSubmitForm } from "../../../helpers/utils";
+import { ExamPayload } from "../../../types/exam.dto";
 
 const ExamDashboard = () => {
 
 
-  const {data:payload} = useCreateExam()
+  const { mutate: CreateExam } = useCreateExam();
+
   const [exams, setExams] = useState([
     {
       id: 1,
@@ -41,52 +44,61 @@ const ExamDashboard = () => {
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
-  const handleSubmit = async () => {
-    const formData = new FormData();
-    formData.append("title", examTitle);
-    formData.append("duration", duration.toString());
-    formData.append("start_time", startTime);
-    formData.append("end_time", endTime);
-    if (questionFile) {
-      formData.append("questions_file", questionFile);
-    }
 
-    try {
-      const response = await fetch("/api/exams", {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      console.log("Exam created/updated:", result);
-      toast.success(editingId ? "Exam updated successfully!" : "Exam created successfully!");
+const [formData, setFormData] = useState<ExamPayload>({
+  title: "",
+  duration: 0,
+  start_date: "",
+  end_date: "",
+  status: "scheduled", // required by ExamPayload
+});
 
-      const newExam = {
-        id: editingId || exams.length + 1,
-        title: examTitle,
-        duration,
-        start_time: startTime,
-        end_time: endTime,
-        status: "scheduled",
-      };
+  // const handleSubmit = async () => {
+  //   const formData = new FormData();
+  //   formData.append("title", examTitle);
+  //   formData.append("duration", duration.toString());
+  //   formData.append("start_time", startTime);
+  //   formData.append("end_time", endTime);
+  //   if (questionFile) {
+  //     formData.append("questions_file", questionFile);
+  //   }
 
-      if (editingId) {
-        setExams((prev) => prev.map((e) => (e.id === editingId ? newExam : e)));
-      } else {
-        setExams([...exams, newExam]);
-      }
+  //   try {
+  //     const response = await fetch("/api/exams", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+  //     const result = await response.json();
+  //     console.log("Exam created/updated:", result);
+  //     toast.success(editingId ? "Exam updated successfully!" : "Exam created successfully!");
 
-      setShowForm(false);
-      setEditingId(null);
-      setExamTitle("");
-      setDuration(60);
-      setStartTime("");
-      setEndTime("");
-      setQuestionFile(null);
-    } catch (error) {
-      toast.error("Failed to create/update exam.");
-      console.error("Upload failed:", error);
-    }
-  };
+  //     const newExam = {
+  //       id: editingId || exams.length + 1,
+  //       title: examTitle,
+  //       duration,
+  //       start_time: startTime,
+  //       end_time: endTime,
+  //       status: "scheduled",
+  //     };
+
+  //     if (editingId) {
+  //       setExams((prev) => prev.map((e) => (e.id === editingId ? newExam : e)));
+  //     } else {
+  //       setExams([...exams, newExam]);
+  //     }
+
+  //     setShowForm(false);
+  //     setEditingId(null);
+  //     setExamTitle("");
+  //     setDuration(60);
+  //     setStartTime("");
+  //     setEndTime("");
+  //     setQuestionFile(null);
+  //   } catch (error) {
+  //     toast.error("Failed to create/update exam.");
+  //     console.error("Upload failed:", error);
+  //   }
+  // };
 
   const handleEdit = (id: number) => {
     const exam = exams.find((e) => e.id === id);
@@ -162,9 +174,9 @@ const ExamDashboard = () => {
             </p>
             <div className="flex gap-2 mt-2 items-center">
               {/* <span className={ exam.status = "text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800"} clas> */}
-              <span className={ exam.status === "scheduled" ? "text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800 capitalize font-bold" :
-                                 exam.status === "active" ? "text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 capitalize font-bold" :
-                                 "text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 capitalize"
+              <span className={exam.status === "scheduled" ? "text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800 capitalize font-bold" :
+                exam.status === "active" ? "text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 capitalize font-bold" :
+                  "text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 capitalize"
               }>
                 {exam.status}
               </span>
@@ -187,37 +199,44 @@ const ExamDashboard = () => {
 
       {/* Exam Creation Form */}
       {showForm && (
-        <div className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
+        <form onSubmit={(e) => handleSubmitForm(CreateExam)(e, formData)} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
           <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             {editingId ? "✏️ Edit Exam" : "📝 Create New Exam"}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
             <input
               type="text"
+              name="title"
               placeholder="Exam Title"
-              value={examTitle}
-              onChange={(e) => setExamTitle(e.target.value)}
+              value={formData.title}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
+
             <input
               type="number"
+              name="duration"
               placeholder="Duration (minutes)"
-              value={duration}
-              onChange={(e) => setDuration(Number(e.target.value))}
+              value={formData.duration}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
+
             <input
               type="datetime-local"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              name="start_date"
+              value={formData.start_date}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
+
             <input
               type="datetime-local"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              name="end_date"
+              value={formData.end_date}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
-                       />
+            />
             {questionFile && (
               <p className="mt-2 text-sm text-green-600 dark:text-green-400">
                 Selected file: <strong>{questionFile.name}</strong>
@@ -227,13 +246,14 @@ const ExamDashboard = () => {
 
           <div className="flex justify-end">
             <button
-              onClick={handleSubmit}
+              // onClick={handleSubmit}
+              type="submit"
               className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-semibold"
             >
               {editingId ? "Update Exam" : "Create Exam"}
             </button>
           </div>
-        </div>
+        </form>
       )}
 
       {/* Modal Edit Form */}
