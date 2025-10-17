@@ -10,11 +10,11 @@ const DashboardHeader = (props: {
   const handleLogout = () => {
     // Clear auth/session storage or call API
     localStorage.removeItem("token");
-    window.location.href = "/"; // redirect to login
+    window.location.href = "/admin"; // redirect to login
   };
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
-      <div className="flex flex-grow items-center justify-end px-4 py-2 shadow-2 md:px-6 2xl:px-11">
+      <div className="flex flex-grow items-center justify-between px-4 py-2 shadow-2 md:px-6 2xl:px-11">
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
           {/* <!-- Hamburger Toggle BTN --> */}
           <button
@@ -63,7 +63,14 @@ const DashboardHeader = (props: {
             <img src={LogoIcon} alt="Logo" className='w-12'/>
           </Link>
         </div>
-
+        <div className="flex flex-col font-satoshi font-bold text-ellipsis overflow-hidden text-[18px] leading-36 text-black dark:text-white">
+          <h3>
+            State: Lagos
+          </h3>
+          <span>
+            Exam Center: 123 - Lagos Island
+          </span>
+        </div>
         {/* <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="relative">

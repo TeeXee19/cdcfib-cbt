@@ -156,19 +156,23 @@ const ExamDashboard = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Duration: {exam.duration} min • {exam.start_time} → {exam.end_time}
             </p>
-            <div className="flex gap-2 mt-2">
-              <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+            <div className="flex gap-2 mt-2 items-center">
+              {/* <span className={ exam.status = "text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800"} clas> */}
+              <span className={ exam.status === "scheduled" ? "text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800 capitalize font-bold" :
+                                 exam.status === "active" ? "text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 capitalize font-bold" :
+                                 "text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 capitalize"
+              }>
                 {exam.status}
               </span>
               <button
                 onClick={() => handleEdit(exam.id)}
-                className="text-blue-600 hover:underline text-sm"
+                className="text-blue-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(exam.id)}
-                className="text-red-600 hover:underline text-sm"
+                className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Delete
               </button>
