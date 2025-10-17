@@ -2,11 +2,21 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam } from "../../../hooks/useExam";
+import { ExamPayload } from "../../../types/exam.dto";
+import { handleInputChange, handleSubmitForm } from "../../../helpers/utils";
 
 const ExamDashboard = () => {
 
+  const [formData, setFormData] = useState<ExamPayload>({
+    title: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+    duration: 0,
+    status: 'scheduled',
+  });
 
-  const {data:payload} = useCreateExam()
+  const { data: createExams } = useCreateExam()
   const [exams, setExams] = useState([
     {
       id: 1,
@@ -187,33 +197,40 @@ const ExamDashboard = () => {
           <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             {editingId ? "✏️ Edit Exam" : "📝 Create New Exam"}
           </h3>
+          <form onSubmit={(e) => handleSubmitForm(createExams)(e, formData)}>
+
+          </form>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
             <input
               type="text"
+              name="title"
               placeholder="Exam Title"
-              value={examTitle}
-              onChange={(e) => setExamTitle(e.target.value)}
+              value={formData.title}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
             <input
               type="number"
+              name="description"
               placeholder="Duration (minutes)"
-              value={duration}
-              onChange={(e) => setDuration(Number(e.target.value))}
+              value={formData.description}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
+              className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
+            />
+            <input
+              name="start_date"
+              type="datetime-local"
+              value={formData.start_date}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
             <input
               type="datetime-local"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              name="end_date"
+              value={formData.end_date}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
-            <input
-              type="datetime-local"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
-                       />
             {questionFile && (
               <p className="mt-2 text-sm text-green-600 dark:text-green-400">
                 Selected file: <strong>{questionFile.name}</strong>
