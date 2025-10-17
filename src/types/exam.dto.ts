@@ -6,3 +6,30 @@ export interface ExamPayload {
   end_date: string;   // ISO 8601 string
   status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
 }
+
+export interface Exam {
+  id: number;
+  title: string;
+  description: string | null;
+  duration: number;
+  start_date: string; // ISO timestamp
+  end_date: string; // ISO timestamp
+  status: "scheduled" | "active" | "completed" | string;
+  created_by: number | null;
+  created_at: string;
+  updated_at: string;
+  creator: string | null;
+}
+
+export interface ExamMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface ExamResponse {
+  data: Exam[];
+  meta: ExamMeta;
+}
+

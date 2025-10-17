@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ApiResponseType {
-  statusCode: number,
+  status: string,
   message: string,
   data: any
 }

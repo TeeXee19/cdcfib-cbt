@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { create, list, update, view, deletRolee } from "../services/exam.service";
 import { showToast } from "../helpers/sweetAlert";
-import { ExamPayload } from "../types/exam.dto";
-import { PaginatedResponse } from "../types/apiResponse";
+import { ExamPayload, ExamResponse } from "../types/exam.dto";
+// import { PaginatedResponse } from "../types/apiResponse";
 
 // 📄 LIST Exams
 export function useExamListQuery(
@@ -12,7 +12,7 @@ export function useExamListQuery(
   sort: string,
   direction: string
 ) {
-  return useQuery<PaginatedResponse<ExamPayload>>({
+  return useQuery<ExamResponse>({
     queryKey: ["exams", page, size, search, sort, direction],
     queryFn: () => list(page, size, search, sort, direction),
   });

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCreateExam } from "../../../hooks/useExam";
-import { ExamPayload } from "../../../types/exam.dto";
+import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
 import { handleInputChange, handleSubmitForm } from "../../../helpers/utils";
+import {ExamPayload } from "../../../types/exam.dto";
 
 const ExamDashboard = () => {
 
@@ -16,32 +16,31 @@ const ExamDashboard = () => {
     status: 'scheduled',
   });
 
-  const { data: createExams } = useCreateExam()
-  const [exams, setExams] = useState([
-    {
-      id: 1,
-      title: "Math Aptitude Test",
-      duration: 60,
-      start_time: "2025-10-15T10:00",
-      end_time: "2025-10-15T11:00",
-      status: "scheduled",
-    },
-    {
-      id: 2,
-      title: "English Proficiency",
-      duration: 45,
-      start_time: "2025-10-17T14:00",
-      end_time: "2025-10-17T14:45",
-      status: "active",
-    },
-  ]);
+  const {data:exams} = useExamListQuery(0, 10, '', 'id', 'asc')
+
+  const { mutate: CreateExam } = useCreateExam();
+
+  // const [exams, setExams] = useState([
+  //   {
+  //     id: 1,
+  //     title: "Math Aptitude Test",
+  //     duration: 60,
+  //     start_time: "2025-10-15T10:00",
+  //     end_time: "2025-10-15T11:00",
+  //     status: "scheduled",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "English Proficiency",
+  //     duration: 45,
+  //     start_time: "2025-10-17T14:00",
+  //     end_time: "2025-10-17T14:45",
+  //     status: "active",
+  //   },
+  // ]);
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [examTitle, setExamTitle] = useState("");
-  const [duration, setDuration] = useState(60);
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
   const [questionFile, setQuestionFile] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -51,75 +50,30 @@ const ExamDashboard = () => {
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
-  const handleSubmit = async () => {
-    const formData = new FormData();
-    formData.append("title", examTitle);
-    formData.append("duration", duration.toString());
-    formData.append("start_time", startTime);
-    formData.append("end_time", endTime);
-    if (questionFile) {
-      formData.append("questions_file", questionFile);
-    }
 
-    try {
-      const response = await fetch("/api/exams", {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      console.log("Exam created/updated:", result);
-      toast.success(editingId ? "Exam updated successfully!" : "Exam created successfully!");
 
-      const newExam = {
-        id: editingId || exams.length + 1,
-        title: examTitle,
-        duration,
-        start_time: startTime,
-        end_time: endTime,
-        status: "scheduled",
-      };
+  // const handleEdit = (id: number) => {
+  //   const exam = exams.find((e) => e.id === id);
+  //   if (exam) {
+  //     setEditExam({ ...exam });
+  //     setShowEditModal(true);
+  //     setEditErrors({});
+  //     setEditFile(null);
+  //   }
+  // };
 
-      if (editingId) {
-        setExams((prev) => prev.map((e) => (e.id === editingId ? newExam : e)));
-      } else {
-        setExams([...exams, newExam]);
-      }
+  // const handleDelete = (id: number) => {
+  //   if (confirm("Are you sure you want to delete this exam?")) {
+  //     // setExams((prev) => prev.filter((e) => e.id !== id));
+  //     toast.success("Exam deleted.");
+  //   }
+  // };
 
-      setShowForm(false);
-      setEditingId(null);
-      setExamTitle("");
-      setDuration(60);
-      setStartTime("");
-      setEndTime("");
-      setQuestionFile(null);
-    } catch (error) {
-      toast.error("Failed to create/update exam.");
-      console.error("Upload failed:", error);
-    }
-  };
-
-  const handleEdit = (id: number) => {
-    const exam = exams.find((e) => e.id === id);
-    if (exam) {
-      setEditExam({ ...exam });
-      setShowEditModal(true);
-      setEditErrors({});
-      setEditFile(null);
-    }
-  };
-
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this exam?")) {
-      setExams((prev) => prev.filter((e) => e.id !== id));
-      toast.success("Exam deleted.");
-    }
-  };
-
-  const filteredExams = exams.filter(
-    (exam) =>
-      exam.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "all" || exam.status === statusFilter)
-  );
+  // const filteredExams = exams.filter(
+  //   (exam) =>
+  //     exam.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+  //     (statusFilter === "all" || exam.status === statusFilter)
+  // );
 
   return (
     <div className="p-6 md:p-10 bg-gray-50 dark:bg-[#101110] min-h-screen">
@@ -129,10 +83,6 @@ const ExamDashboard = () => {
           onClick={() => {
             setShowForm(!showForm);
             setEditingId(null);
-            setExamTitle("");
-            setDuration(60);
-            setStartTime("");
-            setEndTime("");
             setQuestionFile(null);
           }}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
@@ -164,28 +114,32 @@ const ExamDashboard = () => {
 
       {/* Exam List */}
       <ul className="space-y-4 mb-10">
-        {filteredExams.map((exam) => (
+        {exams?.data?.map((exam) => (
           <li key={exam.id} className="bg-white dark:bg-[#1A1B1F] p-4 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{exam.title}</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Duration: {exam.duration} min • {exam.start_time} → {exam.end_time}
+              Duration: {exam.duration} min • {exam.start_date} → {exam.end_date}
             </p>
-            <div className="flex gap-2 mt-2">
-              <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+            <div className="flex gap-2 mt-2 items-center">
+              {/* <span className={ exam.status = "text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800"} clas> */}
+              <span className={exam.status === "scheduled" ? "text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800 capitalize font-bold" :
+                exam.status === 'ongoing' ? "text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 capitalize font-bold" :
+                  "text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 capitalize"
+              }>
                 {exam.status}
               </span>
-              <button
+              {/* <button
                 onClick={() => handleEdit(exam.id)}
-                className="text-blue-600 hover:underline text-sm"
+                className="text-blue-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(exam.id)}
-                className="text-red-600 hover:underline text-sm"
+                className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Delete
-              </button>
+              </button> */}
             </div>
           </li>
         ))}
@@ -193,11 +147,11 @@ const ExamDashboard = () => {
 
       {/* Exam Creation Form */}
       {showForm && (
-        <div className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
+        <form onSubmit={(e) => handleSubmitForm(CreateExam)(e, formData)} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
           <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             {editingId ? "✏️ Edit Exam" : "📝 Create New Exam"}
           </h3>
-          <form onSubmit={(e) => handleSubmitForm(createExams)(e, formData)}>
+          <form onSubmit={(e) => handleSubmitForm(CreateExam)(e, formData)}>
 
           </form>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
@@ -209,21 +163,24 @@ const ExamDashboard = () => {
               onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
+
             <input
               type="number"
-              name="description"
+              name="duration"
               placeholder="Duration (minutes)"
-              value={formData.description}
+              value={formData.duration}
               onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
+
             <input
-              name="start_date"
               type="datetime-local"
+              name="start_date"
               value={formData.start_date}
               onChange={(e) => handleInputChange(e, setFormData, formData)}
               className="p-3 rounded-lg border dark:bg-[#1A1B1F] dark:text-white"
             />
+
             <input
               type="datetime-local"
               name="end_date"
@@ -240,13 +197,14 @@ const ExamDashboard = () => {
 
           <div className="flex justify-end">
             <button
-              onClick={handleSubmit}
+              // onClick={handleSubmit}
+              type="submit"
               className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-semibold"
             >
               {editingId ? "Update Exam" : "Create Exam"}
             </button>
           </div>
-        </div>
+        </form>
       )}
 
       {/* Modal Edit Form */}
@@ -346,9 +304,9 @@ const ExamDashboard = () => {
                     toast.error("Failed to update exam.");
                   }
 
-                  setExams((prev) =>
-                    prev.map((e) => (e.id === editExam.id ? editExam : e))
-                  );
+                  // setExams((prev) =>
+                  //   prev.map((e) => (e.id === editExam.id ? editExam : e))
+                  // );
                   setShowEditModal(false);
                   setEditFile(null);
                 }}
