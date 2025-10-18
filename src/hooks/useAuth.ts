@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  candidateLogin,
   login,
 
 } from "../services/auth.service";
@@ -27,6 +28,34 @@ export function useLoginMutation() {
         setItem('user', JSON.stringify(data.user))
       }
       navigate('/dashboard', {
+        state: variables
+      });
+    },
+    onError: (error: Error) => {
+      console.log(error);
+      // customToast.error(error.message);
+      showToast('error', error.message)
+      // alert(error.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["services"] }).catch(() => { });
+    },
+  });
+}
+export function useCandidateLoginMutation() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: candidateLogin,
+    onSuccess: (data, variables) => {
+      if (data.accessToken) {
+        setItem('token', data.accessToken)
+        showToast('success', "User login successfully");
+      }
+      if (data.examinee) {
+        setItem('examinee', JSON.stringify(data.examinee))
+      }
+      navigate('/exam', {
         state: variables
       });
     },
