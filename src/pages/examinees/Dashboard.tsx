@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
 import { ExamineeSessionPayload } from "../../types/examinee.dto";
 
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
+// import Echo from 'laravel-echo';
+// import Pusher from 'pusher-js';
 
-declare global {
-    interface Window {
-        Pusher: typeof Pusher;
-    }
-}
+// declare global {
+//     interface Window {
+//         Pusher: typeof Pusher;
+//     }
+// }
 
 
 // const rawQuestions = [
@@ -25,7 +25,7 @@ declare global {
 //     { id: 10, type: "boolean", text: "Water boils at 100°C." },
 // ];
 
-const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
+// const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
 const ExamInterface = () => {
     const [examStarted, setExamStarted] = useState(false);

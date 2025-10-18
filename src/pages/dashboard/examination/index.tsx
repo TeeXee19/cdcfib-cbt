@@ -2,8 +2,9 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
-import { handleInputChange } from "../../../helpers/utils";
+import { handleInputChange, formatDate } from "../../../helpers/utils";
 import { ExamPayload } from "../../../types/exam.dto";
+
 
 const ExamDashboard = () => {
 
@@ -144,9 +145,12 @@ const ExamDashboard = () => {
       <ul className="space-y-4 mb-10">
         {exams?.data?.map((exam) => (
           <li key={exam.id} className="bg-white dark:bg-[#1A1B1F] p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{exam.title}</h3>
+            <div className="flex justify-between">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{exam.title}</h3>
+              <span className={exam.type === "Commissioned" ? "font-bold border border-green-600 py-2 px-2 rounded-full bg-green-300" : "font-bold border-amber-600 bg-amber-300 px-2 py-2 rounded-full"}>{exam.type}</span>
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Duration: {exam.duration} min • {exam.start_date} → {exam.end_date}
+              Duration: {exam.duration} min • {formatDate(exam.start_date)} → {formatDate(exam.end_date)}
             </p>
             <div className="flex gap-2 mt-2 items-center">
               {/* <span className={ exam.status = "text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800"} clas> */}
@@ -201,7 +205,7 @@ const ExamDashboard = () => {
               >
                 <option value="">Select type</option>
                 <option value="commissioned">Commissioned</option>
-                <option value="non_commissioned">Non Commissioned</option>
+                <option value="">Non Commissioned</option>
               </select>
             </div>
 
