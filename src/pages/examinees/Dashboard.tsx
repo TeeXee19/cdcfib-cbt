@@ -5,6 +5,7 @@ import { ExamineeSessionPayload } from "../../types/examinee.dto";
 // import Echo from 'laravel-echo';
 // import Pusher from 'pusher-js';
 import { formatTime } from "../../helpers/utils";
+import { useDeleteExam } from "../../hooks/useExam";
 
 // declare global {
 //     interface Window {
@@ -90,6 +91,9 @@ const ExamInterface = () => {
     const initialUser = storedUser ? JSON.parse(storedUser) : null;
     const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
     const { data: exam } = useExamineeExamQuery(user?.id as string);
+
+
+
     // const [visibleQuestions, setVisiblequestions] = useState<QuestionPayload[]>()
 
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
