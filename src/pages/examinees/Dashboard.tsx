@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
+import { ExamineeSessionPayload } from "../../types/examinee.dto";
 
 const rawQuestions = [
     { id: 1, type: "single", text: "Capital of Nigeria?", options: ["Lagos", "Abuja", "Kano", "PH"] },
@@ -15,19 +17,32 @@ const rawQuestions = [
 
 const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
-const ExamInterface = ({ userName = "TOCHUKWU" }) => {
+const ExamInterface = () => {
     const EXAM_DURATION = 60 * 60; // 60 minutes in seconds
     const [examStarted, setExamStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<number, any>>({});
+
+    // const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(EXAM_DURATION);
+    const [timeLeft] = useState(EXAM_DURATION);
     const [currentPage, setCurrentPage] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showResumeModal, setShowResumeModal] = useState(false);
 
     const questionsPerPage = 5;
     const totalPages = Math.ceil(rawQuestions.length / questionsPerPage);
+
+
+    const storedUser = localStorage.getItem("examinee");
+
+    const initialUser = storedUser ? JSON.parse(storedUser) : null;
+    console.log('logged user', initialUser)
+    // setUsername(initialUser?.last_name)
+    const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
+    const { data: exam } = useExamineeExamQuery(user?.id as string);
+
+
 
     // Detect saved session
     useEffect(() => {
@@ -39,26 +54,33 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
         } else {
             setQuestions(shuffleArray(rawQuestions));
         }
+        setUser(initialUser);
     }, []);
 
-    // Timer
-    useEffect(() => {
-        if (!examStarted) return;
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev === 15 * 60) setShowConfirmModal(true);
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    handleSubmit();
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [examStarted]);
+    // useEffect(() => {
+    //     if (user) {
+    //         setUsername(user.first_name)
+    //     }
+    // }, [user])
 
-    // Tab switch warning
+    const handleStartExam = () => {
+        setExamStarted(true); // this will trigger the query
+        document.documentElement.requestFullscreen?.();
+        // setTimeLeft(exam ? exam?.duration * 60 : 0); // optional: initialize timer from exam duration
+        // setQuestions(shuffleArray(rawQuestions)); // if questions are part of exam object
+    };
+
+    useEffect(() => {
+        if (!exam) return;
+
+        const parsedQuestions = exam.questions.map((q: any) => ({
+            ...q,
+            // parse JSON string into object
+            options: JSON.parse(q.options)
+        }));
+
+        setQuestions(parsedQuestions);
+    }, [exam]);
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.hidden && examStarted && !submitted) {
@@ -89,13 +111,6 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
         };
     }, []);
 
-    // Fullscreen lock
-    useEffect(() => {
-        if (examStarted) {
-            document.documentElement.requestFullscreen?.();
-        }
-    }, [examStarted]);
-
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -121,8 +136,8 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
         console.log("Submitted answers:", answers);
     };
 
-    const startIndex = currentPage * questionsPerPage;
-    const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
+    // const startIndex = currentPage * questionsPerPage;
+    // const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
 
     return (
         <div className="min-h-screen bg-white">
@@ -130,7 +145,7 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-green-700 text-white shadow-md">
                 <div className="flex justify-between items-center px-6 py-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
-                        <span className="font-semibold text-lg">Welcome, {userName}</span>
+                        <span className="font-semibold text-lg">Welcome, {initialUser}</span>
                         {examStarted && !submitted && (
                             <span className="text-sm sm:text-base">Page {currentPage + 1} of {totalPages}</span>
                         )}
@@ -164,8 +179,9 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
                         </ul>
                         <button
                             onClick={() => {
-                                setQuestions(shuffleArray(rawQuestions));
-                                setExamStarted(true);
+                                handleStartExam()
+                                // setQuestions(shuffleArray(rawQuestions));
+                                // setExamStarted(true);
                             }}
                             className="bg-green-700 hover:bg-green-800 text-white font-semibold text-[32px] py-3 px-6 rounded-lg transition-all duration-200 mt-[10%]"
                         >
@@ -196,93 +212,95 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
                     </div>
                 ) : (
                     <div className=" space-y-8 overflow-y-auto max-h-[calc(100vh-12rem)] pb-24">
-                        {currentQuestions.map((q) => (
-                            <div key={q.id} className="bg-white dark:bg-[#1A1B1F] w-[50%] p-6 rounded-xl shadow-md mx-auto">
-                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-                                    {q.id}. {q.text}
-                                </h3>
+                        {questions.map((q) => {
 
-                                {q.type === "single" && (
-                                    <div className="space-y-2">
-                                        {q.options.map((opt: string) => (
-                                            <label key={opt} className="flex items-center gap-2">
-                                                <input
-                                                    type="radio"
-                                                    name={`q-${q.id}`}
-                                                    value={opt}
-                                                    checked={answers[q.id] === opt}
+                            return (
+                                <div key={q.id} className="bg-white dark:bg-[#1A1B1F] w-[50%] p-6 rounded-xl shadow-md mx-auto">
+                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                                        {q.id}. {q.question_text}
+                                    </h3>
 
-                                                    onChange={() => handleAnswer(q.id, opt)}
-                                                    className="accent-green-600"
-                                                />
-                                                <span>{opt}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
+                                    {q.question_type === "single_choice" && (
+                                        <div className="space-y-2">
+                                            {Object.entries(q.options).map(([key, value]) => (
+                                                <label key={key} className="flex items-center gap-2">
+                                                    <input
+                                                        type="radio"
+                                                        name={`q-${q.id}`}
+                                                        // value={value}
+                                                        checked={answers[q.id] === value}
+                                                        onChange={() => handleAnswer(q.id, value)}
+                                                        className="accent-green-600"
+                                                    />
+                                                    <span>{value as string}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
 
-                                {q.type === "multiple" && (
-                                    <div className="space-y-2">
-                                        {q.options.map((opt: string) => (
-                                            <label key={opt} className="flex items-center gap-2">
-                                                <input
-                                                    type="checkbox"
-                                                    value={opt}
-                                                    checked={answers[q.id]?.includes(opt)}
-                                                    onChange={(e) => {
-                                                        const prev = answers[q.id] || [];
-                                                        const updated = e.target.checked
-                                                            ? [...prev, opt]
-                                                            : prev.filter((o: string) => o !== opt);
-                                                        handleAnswer(q.id, updated);
-                                                    }}
-                                                    className="accent-green-600"
-                                                />
-                                                <span>{opt}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
+                                    {q.type === "multiple" && (
+                                        <div className="space-y-2">
+                                            {q.options.map((opt: string) => (
+                                                <label key={opt} className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        value={opt}
+                                                        checked={answers[q.id]?.includes(opt)}
+                                                        onChange={(e) => {
+                                                            const prev = answers[q.id] || [];
+                                                            const updated = e.target.checked
+                                                                ? [...prev, opt]
+                                                                : prev.filter((o: string) => o !== opt);
+                                                            handleAnswer(q.id, updated);
+                                                        }}
+                                                        className="accent-green-600"
+                                                    />
+                                                    <span>{opt}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
 
-                                {q.type === "text" && (
-                                    <input
-                                        type="text"
-                                        value={answers[q.id] || ""}
-                                        onChange={(e) => handleAnswer(q.id, e.target.value)}
-                                        className="w-full mt-2 p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
-                                        placeholder="Type your answer..."
-                                    />
-                                )}
+                                    {q.type === "text" && (
+                                        <input
+                                            type="text"
+                                            value={answers[q.id] || ""}
+                                            onChange={(e) => handleAnswer(q.id, e.target.value)}
+                                            className="w-full mt-2 p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
+                                            placeholder="Type your answer..."
+                                        />
+                                    )}
 
-                                {q.type === "number" && (
-                                    <input
-                                        type="number"
-                                        value={answers[q.id] || ""}
-                                        onChange={(e) => handleAnswer(q.id, e.target.value)}
-                                        className="w-full mt-2 p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
-                                        placeholder="Enter a number"
-                                    />
-                                )}
+                                    {q.type === "number" && (
+                                        <input
+                                            type="number"
+                                            value={answers[q.id] || ""}
+                                            onChange={(e) => handleAnswer(q.id, e.target.value)}
+                                            className="w-full mt-2 p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
+                                            placeholder="Enter a number"
+                                        />
+                                    )}
 
-                                {q.type === "boolean" && (
-                                    <div className="flex gap-4 mt-2">
-                                        {["True", "False"].map((opt) => (
-                                            <label key={opt} className="flex items-center gap-2">
-                                                <input
-                                                    type="radio"
-                                                    name={`q-${q.id}`}
-                                                    value={opt}
-                                                    checked={answers[q.id] === opt}
-                                                    onChange={() => handleAnswer(q.id, opt)}
-                                                    className="accent-green-600"
-                                                />
-                                                <span>{opt}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                                    {q.type === "boolean" && (
+                                        <div className="flex gap-4 mt-2">
+                                            {["True", "False"].map((opt) => (
+                                                <label key={opt} className="flex items-center gap-2">
+                                                    <input
+                                                        type="radio"
+                                                        name={`q-${q.id}`}
+                                                        value={opt}
+                                                        checked={answers[q.id] === opt}
+                                                        onChange={() => handleAnswer(q.id, opt)}
+                                                        className="accent-green-600"
+                                                    />
+                                                    <span>{opt}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })}
 
                         {/* Pagination Controls */}
                         {/* <div className="flex justify-between mt-8">

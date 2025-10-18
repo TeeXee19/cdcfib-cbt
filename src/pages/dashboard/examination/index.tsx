@@ -9,7 +9,7 @@ const ExamDashboard = () => {
 
   const [formData, setFormData] = useState<ExamPayload>({
     title: "",
-    description: "",
+    type: "",
     start_date: "",
     end_date: "",
     duration: 0,
@@ -41,7 +41,6 @@ const ExamDashboard = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  // const [questionFile, setQuestionFile] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -50,30 +49,6 @@ const ExamDashboard = () => {
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
-
-
-  // const handleEdit = (id: number) => {
-  //   const exam = exams.find((e) => e.id === id);
-  //   if (exam) {
-  //     setEditExam({ ...exam });
-  //     setShowEditModal(true);
-  //     setEditErrors({});
-  //     setEditFile(null);
-  //   }
-  // };
-
-  // const handleDelete = (id: number) => {
-  //   if (confirm("Are you sure you want to delete this exam?")) {
-  //     // setExams((prev) => prev.filter((e) => e.id !== id));
-  //     toast.success("Exam deleted.");
-  //   }
-  // };
-
-  // const filteredExams = exams.filter(
-  //   (exam) =>
-  //     exam.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-  //     (statusFilter === "all" || exam.status === statusFilter)
-  // );
 
   return (
     <div className="p-6 md:p-10 bg-gray-50 dark:bg-[#101110] min-h-screen">
@@ -128,18 +103,6 @@ const ExamDashboard = () => {
               }>
                 {exam.status}
               </span>
-              {/* <button
-                onClick={() => handleEdit(exam.id)}
-                className="text-blue-600 hover:underline text-xs border px-3 py-1 rounded-full"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(exam.id)}
-                className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
-              >
-                Delete
-              </button> */}
             </div>
           </li>
         ))}
@@ -178,8 +141,8 @@ const ExamDashboard = () => {
               </label>
               <select
                 id="exam_type"
-                name="exam_type"
-                // value={formData.exam_type}
+                name="type"
+                value={formData.type}
                 onChange={(e) => handleInputChange(e, setFormData, formData)}
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >

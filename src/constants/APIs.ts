@@ -1,5 +1,5 @@
 export default {
-    LOGIN: 'identity/access',
+    LOGIN: 'identity',
     SIGNUP: 'auth/register',
     ACTIVATE_ACCOUNT: 'auth/activate',
     FORGOT_PASSWORD: 'auth/forgot-password',
@@ -11,5 +11,6 @@ export default {
     ROLE:'role',
     EXAM:'exams',
     QUESTION:'questions',
-    EXAMINEE:'examinees'
+    EXAMINEE:'examinees',
+    // CANDIDATE_LOGIN:'identity/examinee/login'
 }

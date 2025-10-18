@@ -7,6 +7,7 @@ import {
   view,
   update,
   remove,
+  exam,
 } from "../services/examinee.service";
 import { showToast } from "../helpers/sweetAlert";
 import { ExamineePayload } from "../types/examinee.dto";
@@ -48,6 +49,16 @@ export function useExamineeViewQuery(id: string) {
     enabled: !!id,
   });
 }
+
+
+export function useExamineeExamQuery(id: string) {
+  return useQuery({
+    queryKey: ["examineeExam", id],
+    queryFn: () => exam(), // pass the id to your exam fetch function
+    // enabled: enabled,
+  });
+}
+
 
 /**
  * ➕ CREATE Examinee

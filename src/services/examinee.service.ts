@@ -1,6 +1,6 @@
 import APIs from "../constants/APIs";
 import { PaginatedResponse } from "../types/apiResponse";
-import { ExamineePayload } from "../types/examinee.dto";
+import { ExamineePayload, ExamPayload } from "../types/examinee.dto";
 import { sendRequest } from "./axios.service";
 
 /**
@@ -113,6 +113,17 @@ export async function update(id: string, payload: Partial<ExamineePayload>) {
  */
 export async function remove(id: string) {
   const result = await sendRequest("DELETE", `${APIs.EXAMINEE}/${id}`, {});
+
+  if (result?.status !== "success") {
+    throw new Error(result?.data ?? result?.message);
+  }
+
+  return result.data;
+}
+
+
+export async function exam():Promise<ExamPayload> {
+  const result = await sendRequest("GET", `${APIs.EXAMINEE}/exam`, {});
 
   if (result?.status !== "success") {
     throw new Error(result?.data ?? result?.message);

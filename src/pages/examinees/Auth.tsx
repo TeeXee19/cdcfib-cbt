@@ -1,102 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState} from 'react';
 import ExamineeCard from '../../components/molecules/ExamineeCard';
+import { useCandidateLoginMutation } from '../../hooks/useAuth';
+import { ExamineeAccessPayload } from '../../types/auth.type';
+import { handleInputChange, handleSubmitForm } from '../../helpers/utils';
 // Assuming a custom hook or function for routing/redirection
 // import { useNavigate } from 'react-router-dom'; 
 
 const Auth = () => {
-  const [nin, setNin] = useState('');
-  const [phone, setPhone] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  // const navigate = useNavigate(); // For redirection
 
-  const simulateLoginAPI = (ninValue: string, phoneValue: string): Promise<{ token: string; user: { id: number; name: string } }> => {
-    // This is where the actual API call (e.g., axios.post('/login', ...)) would go
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (ninValue === '11111111111' && phoneValue === '08012345678') {
-          resolve({
-            token: 'mock-jwt-token-12345',
-            user: { id: 101, name: 'Candidate X' }
-          });
-        } else {
-          // General error for security (prevents leaking which field is wrong)
-          reject(new Error("Invalid NIN or Phone Number. Please try again."));
-        }
-      }, 1500); // Simulate network latency
-    });
-  };
-  // ----------------------------------------------------
+  const [formData, setFormData] = useState<ExamineeAccessPayload>({
+    phone_number: "",
+    nin: "",
+  });
+  const { mutate: login, isPending:isLoading, error } = useCandidateLoginMutation()
 
-  const validateInputs = () => {
-    setError('');
-
-    if (!/^\d{11}$/.test(nin)) {
-      setError('National Identification Number (NIN) must be exactly 11 digits.');
-      return false;
-    }
-
-    if (!/^0\d{10}$/.test(phone)) {
-      setError('Phone Number must be in a valid 11-digit Nigerian format (e.g., 08012345678).');
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!validateInputs()) {
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // 1. SIMULATE API CALL
-      const response = await simulateLoginAPI(nin, phone);
-
-      // 2. HANDLE SUCCESS
-      const { token } = response;
-
-      // Store the token (Crucial step for authentication)
-      localStorage.setItem('authToken', token);
-
-      // 3. REDIRECT
-      // navigate('/exam-taker/dashboard'); 
-      console.log('Login successful! Redirecting to dashboard...');
-
-    } catch (err: unknown) {
-      // 4. HANDLE ERROR
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred during login.');
-      }
-      localStorage.removeItem('authToken'); // Ensure token is cleared on failure
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleNumberInputChange = (e: React.ChangeEvent<HTMLInputElement>, setState: React.Dispatch<React.SetStateAction<string>>, maxLength: number) => {
-    const sanitizedValue = e.target.value.replace(/\D/g, '');
-    const limitedValue = sanitizedValue.slice(0, maxLength);
-    setState(limitedValue);
-  };
-
-  // Auto-clear error after 5 seconds
-  useEffect(() => {
-    if (!error) return;
-
-    const timer = setTimeout(() => {
-      setError('');
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [error]);
 
   return (
     <ExamineeCard
@@ -108,7 +25,7 @@ const Auth = () => {
 
 
       <div className="login-container">
-        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        <form onSubmit={(e) => handleSubmitForm(login)(e, formData)}>
           {/* NIN Input Field */}
           <div className="form-group">
             <label htmlFor="nin" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -117,12 +34,12 @@ const Auth = () => {
             <input
               id="nin"
               name="nin"
-              type="tel"
+              type="text"
               inputMode="numeric"
               pattern="\d{11}"
               maxLength={11}
-              value={nin}
-              onChange={(e) => handleNumberInputChange(e, setNin, 11)}
+              value={formData.nin}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               placeholder="e.g., 12345678901"
               required
               aria-describedby="nin-help"
@@ -141,13 +58,13 @@ const Auth = () => {
             </label>
             <input
               id="phone"
-              name="phone"
-              type="tel"
+              name="phone_number"
+              type="text"
               inputMode="numeric"
-              pattern="\d{11}"
+              // pattern="\d{11}"
               maxLength={11}
-              value={phone}
-              onChange={(e) => handleNumberInputChange(e, setPhone, 11)}
+              value={formData.phone_number}
+              onChange={(e) => handleInputChange(e, setFormData, formData)}
               placeholder="e.g., 08012345678"
               required
               aria-describedby="phone-help"
@@ -162,7 +79,7 @@ const Auth = () => {
           {/* Error Display */}
           {error && (
             <p className="text-sm text-red-600 font-medium">
-              {error}
+              {error.message}
             </p>
           )}
 

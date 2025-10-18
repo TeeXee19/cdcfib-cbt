@@ -11,6 +11,12 @@ export interface ForgotPasswordType {
   username: string;
 }
 
+export interface ExamineeAccessPayload {
+  phone_number: string;
+  nin: string;
+}
+
+
 export interface SignupType extends PasswordType {
   email: string;
   firstname: string;
