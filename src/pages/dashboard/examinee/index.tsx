@@ -10,7 +10,7 @@ const CandidateExamStatus = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const rowsPerPage = 5;
 
-  const {data:examinee, isLoading:pending} = useExamineeListQuery(0, 20, '', 'id', 'desc')
+  const {data:examinee} = useExamineeListQuery(0, 20, '', 'id', 'desc')
 
   const [data] = useState([
     {

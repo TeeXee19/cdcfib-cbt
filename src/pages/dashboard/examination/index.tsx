@@ -52,9 +52,9 @@ const ExamDashboard = () => {
 
 
 
-  function setQuestionFile(arg0: null) {
-    throw new Error("Function not implemented.");
-  }
+  // function setQuestionFile(arg0: null) {
+  //   throw new Error("Function not implemented.");
+  // }
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -111,7 +111,7 @@ const ExamDashboard = () => {
           onClick={() => {
             setShowForm(!showForm);
             setEditingId(null);
-            setQuestionFile(null);
+            // setQuestionFile(null);
           }}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
         >
@@ -261,7 +261,7 @@ const ExamDashboard = () => {
                 id="question_file"
                 name="question_file"
                 accept=".csv,.xlsx"
-                onChange={(e) => handleFileChange}
+                onChange={() => handleFileChange}
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#2A2B2F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

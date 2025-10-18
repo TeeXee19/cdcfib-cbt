@@ -136,7 +136,7 @@ const ExamInterface = () => {
         console.log("Submitted answers:", answers);
     };
 
-    const startIndex = currentPage * questionsPerPage;
+    // const startIndex = currentPage * questionsPerPage;
     // const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
 
     return (

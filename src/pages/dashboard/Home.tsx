@@ -2,12 +2,6 @@ import { useEffect, useState } from "react";
 import { useDashboardQuery } from "../../hooks/dashboard.hooks";
 import { useExamListQuery } from "../../hooks/useExam";
 
-const initialExams = [
-  { id: 1, title: "Commissioned Test", date: "Oct 15, 2025", time: "10:00 AM", status: "scheduled" },
-  { id: 2, title: "Non-Commissioned Test", date: "Oct 17, 2025", time: "2:00 PM", status: "active" },
-  { id: 3, title: "General Knowledge", date: "Oct 20, 2025", time: "9:00 AM", status: "completed" },
-];
-
 const categoryBreakdown = [
   { category: "Commissioned", count: 2 },
   { category: "Non-Commissioned", count: 1 },

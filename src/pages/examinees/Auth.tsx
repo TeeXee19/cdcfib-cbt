@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState} from 'react';
 import ExamineeCard from '../../components/molecules/ExamineeCard';
 import { useCandidateLoginMutation } from '../../hooks/useAuth';
 import { ExamineeAccessPayload } from '../../types/auth.type';
