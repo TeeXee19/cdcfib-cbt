@@ -25,7 +25,7 @@ export function useLoginMutation() {
         showToast('success', "User login successfully");
       }
       if (data.user) {
-        setItem('user', JSON.stringify(data.user))
+        setItem('user', data.user)
       }
       navigate('/dashboard', {
         state: variables
@@ -53,7 +53,7 @@ export function useCandidateLoginMutation() {
         showToast('success', "User login successfully");
       }
       if (data.examinee) {
-        setItem('examinee', JSON.stringify(data.examinee))
+        setItem('examinee', data.examinee)
       }
       navigate('/exam', {
         state: variables

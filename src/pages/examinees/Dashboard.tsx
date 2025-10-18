@@ -2,46 +2,94 @@ import { useState, useEffect } from "react";
 import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
 import { ExamineeSessionPayload } from "../../types/examinee.dto";
 
-const rawQuestions = [
-    { id: 1, type: "single", text: "Capital of Nigeria?", options: ["Lagos", "Abuja", "Kano", "PH"] },
-    { id: 2, type: "multiple", text: "Select organs in the human body:", options: ["Liver", "Brain", "Heart", "Lungs"] },
-    { id: 3, type: "text", text: "Who wrote 'Things Fall Apart'?" },
-    { id: 4, type: "number", text: "What is 5 + 7?" },
-    { id: 5, type: "boolean", text: "The sun rises in the east." },
-    { id: 6, type: "single", text: "Deepest ocean?", options: ["Atlantic", "Indian", "Pacific", "Arctic"] },
-    { id: 7, type: "multiple", text: "Which are programming languages?", options: ["Python", "HTML", "JavaScript", "CSS"] },
-    { id: 8, type: "text", text: "Name a Nigerian state that starts with 'K'." },
-    { id: 9, type: "number", text: "How many days are in a leap year?" },
-    { id: 10, type: "boolean", text: "Water boils at 100°C." },
-];
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+declare global {
+    interface Window {
+        Pusher: typeof Pusher;
+    }
+}
+
+
+// const rawQuestions = [
+//     { id: 1, type: "single", text: "Capital of Nigeria?", options: ["Lagos", "Abuja", "Kano", "PH"] },
+//     { id: 2, type: "multiple", text: "Select organs in the human body:", options: ["Liver", "Brain", "Heart", "Lungs"] },
+//     { id: 3, type: "text", text: "Who wrote 'Things Fall Apart'?" },
+//     { id: 4, type: "number", text: "What is 5 + 7?" },
+//     { id: 5, type: "boolean", text: "The sun rises in the east." },
+//     { id: 6, type: "single", text: "Deepest ocean?", options: ["Atlantic", "Indian", "Pacific", "Arctic"] },
+//     { id: 7, type: "multiple", text: "Which are programming languages?", options: ["Python", "HTML", "JavaScript", "CSS"] },
+//     { id: 8, type: "text", text: "Name a Nigerian state that starts with 'K'." },
+//     { id: 9, type: "number", text: "How many days are in a leap year?" },
+//     { id: 10, type: "boolean", text: "Water boils at 100°C." },
+// ];
 
 const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
 const ExamInterface = () => {
-    const EXAM_DURATION = 60 * 60; // 60 minutes in seconds
     const [examStarted, setExamStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<number, any>>({});
 
+
+    // const countdown = setInterval(() => {
+    //     setTimeLeft((prev) => {
+    //         const next = prev - 1;
+
+    //         // 🔁 every 10 seconds, push to server
+    //         if (next % 10 === 0) {
+    //             console.log("⏱ Sending timer update:", next);
+    //             echo.connector.pusher.send_event(
+    //                 "client-timer-update",
+    //                 {
+    //                     userId,
+    //                     timeLeft: next,
+    //                 },
+    //                 `private-exam-timer.${userId}`
+    //             );
+    //         }
+
+    //         return next > 0 ? next : 0;
+    //     });
+    //      echo.private(`exam-timer.${userId}`).whisper();
+    // }, 1000);
+
+    // useEffect(() => {
+    //     clearInterval(countdown )
+    // }, [])
+
+    // channel.listen(".timer-updated", (data: any) => {
+    //     console.log("Timer broadcasted from backend:", data);
+    //     //   setTimeRemaining(data.timeRemaining);
+    // });
+
+    // const pusher = echo.connector;
+
+    // Listen for connection state changes
+    // pusher.connection.bind('connected', () => {
+    //     console.log('✅ Connected to WebSocket server!');
+    // });
+
+
+
     const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
-    const [timeLeft] = useState(EXAM_DURATION);
+    const [timeLeft, setTimeLeft] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showResumeModal, setShowResumeModal] = useState(false);
 
-    const questionsPerPage = 5;
-    const totalPages = Math.ceil(rawQuestions.length / questionsPerPage);
+    const questionsPerPage = 2;
 
 
     const storedUser = localStorage.getItem("examinee");
 
     const initialUser = storedUser ? JSON.parse(storedUser) : null;
-    console.log('logged user', initialUser)
-    // setUsername(initialUser?.last_name)
     const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
     const { data: exam } = useExamineeExamQuery(user?.id as string);
 
+    const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
 
 
     // Detect saved session
@@ -52,10 +100,26 @@ const ExamInterface = () => {
         if (savedAnswers || savedPage) {
             setShowResumeModal(true);
         } else {
-            setQuestions(shuffleArray(rawQuestions));
+            // setQuestions(shuffleArray(rawQuestions));
         }
         setUser(initialUser);
     }, []);
+
+    useEffect(() => {
+        if (!examStarted) return;
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev === 15 * 60) setShowConfirmModal(true);
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    handleSubmit();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [examStarted]);
 
     useEffect(() => {
         if (user) {
@@ -78,7 +142,7 @@ const ExamInterface = () => {
             // parse JSON string into object
             options: JSON.parse(q.options)
         }));
-
+        setTimeLeft(Number(user.time_left)* 60)
         setQuestions(parsedQuestions);
     }, [exam]);
     useEffect(() => {
@@ -170,8 +234,8 @@ const ExamInterface = () => {
                     <div className="max-w-3xl mx-auto mt-20 space-y-[10%] text-center">
                         <h2 className="text-[48px] font-bold text-green-700 dark:text-green-400">Exam Instructions</h2>
                         <ul className="text-left list-inside text-[color:var(--text-color)] text-[18px] text-gray-700 dark:text-gray-300 space-y-2">
-                            <li><span className="inline-block mr-2 text-blue-600">ℹ️</span>This exam includes single/multiple choice, text, number, and true/false questions.</li>
-                            <li><span className="inline-block mr-2 text-blue-600">ℹ️</span>You have {EXAM_DURATION / 60} minutes to complete the exam.</li>
+                            <li><span className="inline-block mr-2 text-blue-600">ℹ️</span>This exam time single/multiple choice, text, number, and true/false questions.</li>
+                            <li><span className="inline-block mr-2 text-blue-600">ℹ️</span>You have {timeLeft / 60} minutes to complete the exam.</li>
                             <li><span className="inline-block mr-2 text-orange-500">⚠️</span>Do not switch tabs or minimize your browser.</li>
                             <li><span className="inline-block mr-2 text-orange-500">⚠️</span>Inspect tools and shortcuts are disabled.</li>
                             <li><span className="inline-block mr-2 text-blue-600">ℹ️</span>Answers are auto-saved and can be resumed if interrupted.</li>
@@ -370,7 +434,7 @@ const ExamInterface = () => {
                                 onClick={() => {
                                     setAnswers(JSON.parse(localStorage.getItem("examAnswers") || "{}"));
                                     setCurrentPage(Number(localStorage.getItem("examPage") || 0));
-                                    setQuestions(shuffleArray(rawQuestions));
+                                    // setQuestions(shuffleArray(rawQuestions));
                                     setShowResumeModal(false);
                                     setExamStarted(true);
                                 }}
@@ -382,7 +446,7 @@ const ExamInterface = () => {
                                 onClick={() => {
                                     localStorage.removeItem("examAnswers");
                                     localStorage.removeItem("examPage");
-                                    setQuestions(shuffleArray(rawQuestions));
+                                    // setQuestions(shuffleArray(rawQuestions));
                                     setShowResumeModal(false);
                                 }}
                                 className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg"
