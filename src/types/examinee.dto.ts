@@ -54,5 +54,11 @@ export interface ExamineeSessionPayload {
   updated_at: string;
 }
 
+export interface CreateAnswerPayload {
+  question_id: number;
+  answer: string;
+}
+
+
 
 

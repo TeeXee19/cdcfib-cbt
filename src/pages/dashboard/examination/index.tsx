@@ -150,11 +150,14 @@ const ExamDashboard = () => {
             const date = new Date(value);
             const formatted = date.toISOString().slice(0, 19).replace("T", " ");
             data.append(key, formatted);
+            
           } else {
             data.append(key, value.toString());
           }
         }
       });
+
+
 
       const result = await CreateExam(data); // call your API
       // showToast("success", "Exam uploaded successfully!");
