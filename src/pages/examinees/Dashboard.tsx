@@ -17,7 +17,7 @@ const rawQuestions = [
 
 const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
-const ExamInterface = ({ userName = "TOCHUKWU" }) => {
+const ExamInterface = () => {
     const EXAM_DURATION = 60 * 60; // 60 minutes in seconds
     const [examStarted, setExamStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
@@ -137,7 +137,7 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
     };
 
     const startIndex = currentPage * questionsPerPage;
-    const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
+    // const currentQuestions = questions.slice(startIndex, startIndex + questionsPerPage);
 
     return (
         <div className="min-h-screen bg-white">
@@ -145,7 +145,7 @@ const ExamInterface = ({ userName = "TOCHUKWU" }) => {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-green-700 text-white shadow-md">
                 <div className="flex justify-between items-center px-6 py-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
-                        <span className="font-semibold text-lg">Welcome, {initialUser}</span>
+                        <span className="font-semibold text-lg">Welcome, {username}</span>
                         {examStarted && !submitted && (
                             <span className="text-sm sm:text-base">Page {currentPage + 1} of {totalPages}</span>
                         )}

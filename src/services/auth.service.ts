@@ -1,5 +1,5 @@
 import APIs from "../constants/APIs";
-import { AuthData } from "../types/apiResponse";
+// import { AuthData } from "../types/apiResponse";
 import {
   ExamineeAccessPayload,
   LoginType,
@@ -8,7 +8,7 @@ import { sendRequest } from "./axios.service";
 
 export async function login(payload: LoginType) {
   // const response = await axiosApi.post(APIs.LOGIN, payload)
-  const result = await sendRequest("POST", `${APIs.LOGIN}/login`, payload, false);
+  const result = await sendRequest("POST", `${APIs.LOGIN}/access`, payload, false);
   if (result?.status != 'success') {
     throw new Error(result?.data ?? result?.message);
   }

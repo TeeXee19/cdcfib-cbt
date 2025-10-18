@@ -14,6 +14,7 @@ const ExamDashboard = () => {
     end_date: "",
     duration: 0,
     status: 'scheduled',
+    question_file: ''
   });
 
   const { data: exams } = useExamListQuery(0, 10, '', 'id', 'asc')
@@ -55,28 +56,52 @@ const ExamDashboard = () => {
     throw new Error("Function not implemented.");
   }
 
-  // const handleEdit = (id: number) => {
-  //   const exam = exams.find((e) => e.id === id);
-  //   if (exam) {
-  //     setEditExam({ ...exam });
-  //     setShowEditModal(true);
-  //     setEditErrors({});
-  //     setEditFile(null);
-  //   }
-  // };
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFormData: React.Dispatch<React.SetStateAction<any>>,
+    formData: any
+  ) => {
+    if (!e.target.files || e.target.files.length === 0) return;
 
-  // const handleDelete = (id: number) => {
-  //   if (confirm("Are you sure you want to delete this exam?")) {
-  //     // setExams((prev) => prev.filter((e) => e.id !== id));
-  //     toast.success("Exam deleted.");
-  //   }
-  // };
+    const file = e.target.files[0];
 
-  // const filteredExams = exams.filter(
-  //   (exam) =>
-  //     exam.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-  //     (statusFilter === "all" || exam.status === statusFilter)
-  // );
+    // Optional: validate file type
+    const allowedTypes = [".csv", ".xlsx"];
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    if (!fileExtension || !allowedTypes.includes(`.${fileExtension}`)) {
+      alert("Invalid file type. Only CSV or XLSX allowed.");
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      question_file: file,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (key === "question_file" && value instanceof File) {
+            data.append("file", value);
+          } else {
+            data.append(key, value.toString());
+          }
+        }
+      });
+
+      const result = await CreateExam(data); // call your API
+      // showToast("success", "Exam uploaded successfully!");
+      console.log("Upload result:", result);
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      // showToast("error", error.message || "Failed to upload exam.");
+    }
+  };
 
   return (
     <div className="p-6 md:p-10 bg-gray-50 dark:bg-[#101110] min-h-screen">
@@ -131,18 +156,6 @@ const ExamDashboard = () => {
               }>
                 {exam.status}
               </span>
-              {/* <button
-                onClick={() => handleEdit(exam.id)}
-                className="text-blue-600 hover:underline text-xs border px-3 py-1 rounded-full"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(exam.id)}
-                className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
-              >
-                Delete
-              </button> */}
             </div>
           </li>
         ))}
@@ -150,7 +163,7 @@ const ExamDashboard = () => {
 
       {/* Exam Creation Form */}
       {showForm && (
-        <form onSubmit={(e) => handleSubmitForm(CreateExam)(e, formData)} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
           <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             {editingId ? "✏️ Edit Exam" : "📝 Create New Exam"}
           </h3>
@@ -248,7 +261,7 @@ const ExamDashboard = () => {
                 id="question_file"
                 name="question_file"
                 accept=".csv,.xlsx"
-                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                onChange={(e) => handleFileChange}
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#2A2B2F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
