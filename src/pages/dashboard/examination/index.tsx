@@ -41,7 +41,7 @@ const ExamDashboard = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [questionFile, setQuestionFile] = useState<File | null>(null);
+  // const [questionFile, setQuestionFile] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -83,7 +83,7 @@ const ExamDashboard = () => {
           onClick={() => {
             setShowForm(!showForm);
             setEditingId(null);
-            setQuestionFile(null);
+            // setQuestionFile(null);
           }}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
         >
@@ -179,7 +179,7 @@ const ExamDashboard = () => {
               <select
                 id="exam_type"
                 name="exam_type"
-                value={formData.exam_type}
+                // value={formData.exam_type}
                 onChange={(e) => handleInputChange(e, setFormData, formData)}
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
