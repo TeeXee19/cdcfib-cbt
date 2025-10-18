@@ -58,8 +58,8 @@ export async function view(id: string) {
     return result.data;
 }
 
-export async function deletRolee(roleId: string) {
-    const result = await sendRequest("DELETE", `${APIs.EXAM}/${roleId}`, {});
+export async function deletRExam(examId: number) {
+    const result = await sendRequest("DELETE", `${APIs.EXAM}/${examId}`, {});
     if (result?.status !== 'success') {
         throw new Error(result?.data ?? result?.message);
     }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
+import { useCreateExam, useDeleteExam, useExamListQuery } from "../../../hooks/useExam";
 import { formatDate, handleInputChange } from "../../../helpers/utils";
 import { ExamPayload } from "../../../types/exam.dto";
 
@@ -51,6 +51,7 @@ const ExamDashboard = () => {
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
+      const {mutate:deleteExam} = useDeleteExam();
 
 
   // function setQuestionFile(arg0: null) {
@@ -168,7 +169,7 @@ const ExamDashboard = () => {
                 Edit
               </button>
               <button
-                // onClick={() => handleDelete(exam.id)}
+                onClick={() => deleteExam({id:exam.id})}
                 className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Delete

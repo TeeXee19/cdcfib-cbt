@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { create, list, update, view, deletRolee } from "../services/exam.service";
+import { create, list, update, view, deletRExam } from "../services/exam.service";
 import { showToast } from "../helpers/sweetAlert";
 import { ExamPayload, ExamResponse } from "../types/exam.dto";
 // import { PaginatedResponse } from "../types/apiResponse";
@@ -62,7 +62,8 @@ export function useUpdateExam() {
 export function useDeleteExam() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deletRolee,
+      mutationFn: ({ id }: { id: number }) =>
+      deletRExam(id),
     onSuccess: () => {
       showToast("success", "Exam deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["exams"] });
