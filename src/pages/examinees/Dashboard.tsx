@@ -3,14 +3,14 @@ import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
 import { ExamineeSessionPayload } from "../../types/examinee.dto";
 
 // import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
+// import Pusher from 'pusher-js';
 import { formatTime } from "../../helpers/utils";
 
-declare global {
-    interface Window {
-        Pusher: typeof Pusher;
-    }
-}
+// declare global {
+//     interface Window {
+//         Pusher: typeof Pusher;
+//     }
+// }
 
 
 // const rawQuestions = [

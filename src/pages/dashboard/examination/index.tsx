@@ -5,6 +5,7 @@ import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
 import { formatDate, handleInputChange } from "../../../helpers/utils";
 import { ExamPayload } from "../../../types/exam.dto";
 
+
 const ExamDashboard = () => {
 
   const [formData, setFormData] = useState<ExamPayload>({
@@ -144,7 +145,10 @@ const ExamDashboard = () => {
       <ul className="space-y-4 mb-10">
         {exams?.data?.map((exam) => (
           <li key={exam.id} className="bg-white dark:bg-[#1A1B1F] p-4 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{exam.title}</h3>
+            <div className="flex justify-between">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{exam.title}</h3>
+              <span className={exam.type === "Commissioned" ? "font-bold border border-green-600 py-2 px-2 rounded-full bg-green-300" : "font-bold border-amber-600 bg-amber-300 px-2 py-2 rounded-full"}>{exam.type}</span>
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Duration: {exam.duration} min • {formatDate(new Date(exam.start_date))} → {formatDate(new Date(exam.end_date))}
             </p>
@@ -157,6 +161,18 @@ const ExamDashboard = () => {
               }>
                 {exam.status}
               </span>
+              <button
+                onClick={() => handleEdit(exam.id)}
+                className="text-blue-600 hover:underline text-xs border px-3 py-1 rounded-full"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(exam.id)}
+                className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
+              >
+                Delete
+              </button>
             </div>
           </li>
         ))}
