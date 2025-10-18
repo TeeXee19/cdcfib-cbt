@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer, } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam, useDeleteExam, useExamListQuery, useUpdateExam } from "../../../hooks/useExam";
 import { formatDate, handleInputChange } from "../../../helpers/utils";
@@ -52,7 +52,7 @@ const ExamDashboard = () => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editExam, setEditExam] = useState<any>(null);
+  // const [editExam, setEditExam] = useState<any>(null);
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
@@ -220,7 +220,7 @@ const ExamDashboard = () => {
             <div className="flex gap-2 mt-2 items-center">
               {/* <span className={ exam.status = "text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800"} clas> */}
               <span className={exam.status === "scheduled" ? "text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800 capitalize font-bold" :
-                exam.status === 'ongoing' ? "text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 capitalize font-bold" :
+                exam.status === 'active' ? "text-xs px-3 py-1 rounded-full bg-green-100 text-green-800 capitalize font-bold" :
                   "text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-800 capitalize"
               }>
                 {exam.status}
@@ -432,44 +432,7 @@ const ExamDashboard = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={async () => {
-                    const errors: any = {};
-                    if (!editExam.title.trim()) errors.title = "Title is required";
-                    if (!editExam.duration || editExam.duration <= 0) errors.duration = "Duration must be positive";
-                    if (new Date(editExam.start_time) >= new Date(editExam.end_time)) {
-                      errors.time = "Start time must be before end time";
-                    }
-
-                    if (Object.keys(errors).length > 0) {
-                      setEditErrors(errors);
-                      return;
-                    }
-
-                    const formData = new FormData();
-                    formData.append("title", editExam.title);
-                    formData.append("duration", editExam.duration.toString());
-                    formData.append("start_time", editExam.start_time);
-                    formData.append("end_time", editExam.end_time);
-                    if (editFile) {
-                      formData.append("questions_file", editFile);
-                    }
-
-                    try {
-                      await fetch(`/api/exams/${editExam.id}`, {
-                        method: "PATCH",
-                        body: formData,
-                      });
-                      toast.success("Exam updated.");
-                    } catch (err) {
-                      toast.error("Failed to update exam.");
-                    }
-
-                    // setExams((prev) =>
-                    //   prev.map((e) => (e.id === editExam.id ? editExam : e))
-                    // );
-                    setShowEditModal(false);
-                    setEditFile(null);
-                  }}
+                  type="submit"
                   className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-semibold"
                 >
                   Save Changes
