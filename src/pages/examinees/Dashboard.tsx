@@ -247,7 +247,7 @@ const ExamInterface = () => {
                     </div>
                 ) : (
                     <div className=" space-y-8 overflow-y-auto max-h-[calc(100vh-12rem)] pb-24">
-                        {questions.map((q) => {
+                        {paginatedQuestions.map((q) => {
 
                             return (
                                 <div key={q.id} className="bg-white dark:bg-[#1A1B1F] w-[50%] p-6 rounded-xl shadow-md mx-auto">
