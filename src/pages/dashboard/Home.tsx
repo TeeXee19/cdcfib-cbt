@@ -57,9 +57,18 @@ const ExamSummaryDashboard = () => {
   ];
 
 
-  const handleStartExa = () => {
-    if (!exam) return
-    updateExam({ id: exam.id, payload: { status: 'active' } })
+  const handleStartExa = (action: any) => {
+    if (action === 'end') {
+      if (!exam) return
+      updateExam({ id: exam.id, payload: { status: 'completed' } })
+      setTimeout(() => {
+         setConfirmModal({ show: false, action: "", examId: null })
+      }, 1000);
+    } else {
+      if (!exam) return
+      updateExam({ id: exam.id, payload: { status: 'active' } })
+    }
+    setConfirmModal({ show: false, action: "", examId: null })
   }
 
   useEffect(() => {
@@ -149,7 +158,7 @@ const ExamSummaryDashboard = () => {
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => {
-                  handleStartExa()
+                  handleStartExa(confirmModal.action)
                   // updateExam({ id: exam?.id, payload: { status: '' } })
                 }}
                 className="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 rounded-lg"

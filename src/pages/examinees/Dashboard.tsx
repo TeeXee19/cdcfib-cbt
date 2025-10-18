@@ -162,9 +162,9 @@ const ExamInterface = () => {
     };
 
     const paginatedQuestions = questions.slice(
-    currentPage * questionsPerPage,
-    (currentPage + 1) * questionsPerPage
-);
+        currentPage * questionsPerPage,
+        (currentPage + 1) * questionsPerPage
+    );
 
     return (
         <div className="min-h-screen bg-white">

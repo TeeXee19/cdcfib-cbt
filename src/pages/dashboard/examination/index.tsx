@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam, useDeleteExam, useExamListQuery, useUpdateExam } from "../../../hooks/useExam";
 import { formatDate, handleInputChange } from "../../../helpers/utils";
@@ -53,8 +53,8 @@ const ExamDashboard = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   // const [editExam, setEditExam] = useState<any>(null);
-  const [editErrors, setEditErrors] = useState<any>({});
-  const [editFile, setEditFile] = useState<File | null>(null);
+  // const [editErrors, setEditErrors] = useState<any>({});
+  // const [editFile, setEditFile] = useState<File | null>(null);
 
   const { mutate: deleteExam } = useDeleteExam();
 
@@ -373,7 +373,7 @@ const ExamDashboard = () => {
                   onChange={(e) => handleInputChange(e, setFormData, formData)}
                   className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
                 />
-                {editErrors.title && <p className="text-red-500 text-sm">{editErrors.title}</p>}
+                {/* {editErrors.title && <p className="text-red-500 text-sm">{editErrors.title}</p>} */}
 
                 <input
                   type="number"
@@ -383,7 +383,7 @@ const ExamDashboard = () => {
                   onChange={(e) => handleInputChange(e, setFormData, formData)}
                   className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
                 />
-                {editErrors.duration && <p className="text-red-500 text-sm">{editErrors.duration}</p>}
+                {/* {editErrors.duration && <p className="text-red-500 text-sm">{editErrors.duration}</p>} */}
 
                 <input
                   type="datetime-local"
@@ -399,7 +399,7 @@ const ExamDashboard = () => {
                   onChange={(e) => handleInputChange(e, setFormData, formData)}
                   className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
                 />
-                {editErrors.time && <p className="text-red-500 text-sm">{editErrors.time}</p>}
+                {/* {editErrors.time && <p className="text-red-500 text-sm">{editErrors.time}</p>} */}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
@@ -413,11 +413,11 @@ const ExamDashboard = () => {
                     onChange={(e) => handleFileChange(e, setFormData, formData)}
                     className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#2A2B2F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  {editFile && (
+                  {/* {editFile && (
                     <p className="mt-1 text-sm text-green-600 dark:text-green-400">
                       Selected: <strong>{editFile.name}</strong>
                     </p>
-                  )}
+                  )} */}
                 </div>
               </div>
 
