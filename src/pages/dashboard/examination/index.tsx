@@ -52,7 +52,7 @@ const ExamDashboard = () => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editExam, setEditExam] = useState<any>(null);
+  // const [editExam, setEditExam] = useState<any>(null);
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
@@ -431,11 +431,11 @@ const ExamDashboard = () => {
                 <button
                   onClick={async () => {
                     const errors: any = {};
-                    if (!editExam.title.trim()) errors.title = "Title is required";
-                    if (!editExam.duration || editExam.duration <= 0) errors.duration = "Duration must be positive";
-                    if (new Date(editExam.start_time) >= new Date(editExam.end_time)) {
-                      errors.time = "Start time must be before end time";
-                    }
+                    // if (!editExam.title.trim()) errors.title = "Title is required";
+                    // if (!editExam.duration || editExam.duration <= 0) errors.duration = "Duration must be positive";
+                    // if (new Date(editExam.start_time) >= new Date(editExam.end_time)) {
+                    //   errors.time = "Start time must be before end time";
+                    // }
 
                     if (Object.keys(errors).length > 0) {
                       setEditErrors(errors);
@@ -443,19 +443,19 @@ const ExamDashboard = () => {
                     }
 
                     const formData = new FormData();
-                    formData.append("title", editExam.title);
-                    formData.append("duration", editExam.duration.toString());
-                    formData.append("start_time", editExam.start_time);
-                    formData.append("end_time", editExam.end_time);
+                    // formData.append("title", editExam.title);
+                    // formData.append("duration", editExam.duration.toString());
+                    // formData.append("start_time", editExam.start_time);
+                    // formData.append("end_time", editExam.end_time);
                     if (editFile) {
                       formData.append("questions_file", editFile);
                     }
 
                     try {
-                      await fetch(`/api/exams/${editExam.id}`, {
-                        method: "PATCH",
-                        body: formData,
-                      });
+                      // await fetch(`/api/exams/${editExam.id}`, {
+                      //   method: "PATCH",
+                      //   body: formData,
+                      // });
                       toast.success("Exam updated.");
                     } catch (err) {
                       toast.error("Failed to update exam.");

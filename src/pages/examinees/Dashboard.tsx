@@ -14,19 +14,6 @@ import { formatTime } from "../../helpers/utils";
 // }
 
 
-// const rawQuestions = [
-//     { id: 1, type: "single", text: "Capital of Nigeria?", options: ["Lagos", "Abuja", "Kano", "PH"] },
-//     { id: 2, type: "multiple", text: "Select organs in the human body:", options: ["Liver", "Brain", "Heart", "Lungs"] },
-//     { id: 3, type: "text", text: "Who wrote 'Things Fall Apart'?" },
-//     { id: 4, type: "number", text: "What is 5 + 7?" },
-//     { id: 5, type: "boolean", text: "The sun rises in the east." },
-//     { id: 6, type: "single", text: "Deepest ocean?", options: ["Atlantic", "Indian", "Pacific", "Arctic"] },
-//     { id: 7, type: "multiple", text: "Which are programming languages?", options: ["Python", "HTML", "JavaScript", "CSS"] },
-//     { id: 8, type: "text", text: "Name a Nigerian state that starts with 'K'." },
-//     { id: 9, type: "number", text: "How many days are in a leap year?" },
-//     { id: 10, type: "boolean", text: "Water boils at 100°C." },
-// ];
-
 // const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
 const ExamInterface = () => {
@@ -280,7 +267,7 @@ const ExamInterface = () => {
             {/* Body */}
             <main className="pt-28 my-auto">
                 {!examStarted && !showResumeModal ? (
-                    <div className="max-w-3xl mx-auto mt-20 space-y-[10%] text-center">
+                    <div className="max-w-3xl mx-auto mt-10 space-y-[10%] text-center">
                         <h2 className="text-[48px] font-bold text-green-700 dark:text-green-400">Exam Instructions</h2>
                         <ul className="text-left list-inside text-[color:var(--text-color)] text-[18px] text-gray-700 dark:text-gray-300 space-y-2">
                             <li><span className="inline-block mr-2 text-blue-600">ℹ️</span>This exam time single/multiple choice, text, number, and true/false questions.</li>
@@ -318,7 +305,7 @@ const ExamInterface = () => {
                                 <li>Thank you for completing the exam. Best of luck!</li>
                             </ul>
                         </div>
-                        <button className="px-6 py-4 rounded-lg bg-red-600 dark:bg-red-500 text-[20px] text-white dark:text-white disabled:opacity-50 font-bold" onClick={() => window.location.href = '/examinee/'}>
+                        <button className="px-6 py-4 rounded-lg bg-red-600 dark:bg-red-500 text-[20px] text-white dark:text-white disabled:opacity-50 font-bold" onClick={() => window.location.href = '/'}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M3 4.5A1.5 1.5 0 014.5 3h7a1.5 1.5 0 010 3h-7A1.5 1.5 0 013 4.5zM3 10a1.5 1.5 0 011.5-1.5h7a1.5 1.5 0 010 3h-7A1.5 1.5 0 013 10zm0 5.5A1.5 1.5 0 014.5 14h7a1.5 1.5 0 010 3h-7A1.5 1.5 0 013 15.5zM16.354 8.354a.5.5 0 00-.708-.708l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708-.708L14.207 11H19.5a.5.5 0 000-1h-5.293l2.147-2.146z" clipRule="evenodd" />
                             </svg>
