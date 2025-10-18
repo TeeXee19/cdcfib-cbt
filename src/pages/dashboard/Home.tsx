@@ -4,19 +4,16 @@ import { useExamListQuery, useUpdateExam } from "../../hooks/useExam";
 import { formatDate } from "../../helpers/utils";
 import { Exam } from "../../types/exam.dto";
 
-const categoryBreakdown = [
-  { category: "Commissioned", count: 2 },
-  { category: "Non-Commissioned", count: 1 },
-];
+// const categoryBreakdown = [
+//   { category: "Commissioned", count: 2 },
+//   { category: "Non-Commissioned", count: 1 },
+// ];
 
 const ExamSummaryDashboard = () => {
   // const [exams, setExams] = useState(initialExams);
   const [confirmModal, setConfirmModal] = useState<any>({ show: false, action: "", examId: null });
-
   const { data: summary } = useDashboardQuery()
-
   const { mutate: updateExam } = useUpdateExam()
-
   const [exam, setExam] = useState<Exam | null>(null);
 
   const handleConfirm = (action: string, exam: Exam) => {
@@ -51,9 +48,9 @@ const ExamSummaryDashboard = () => {
       color: "bg-purple-100 text-purple-800"
     },
     { label: "Completed Exams", value: summary?.exam_counts.find(r => r.status == 'completed')?.total, icon: "📦", color: "bg-indigo-100 text-indigo-800" },
-    { label: "Pending Submissions", value: 12, icon: "⏳", color: "bg-red-100 text-red-800" },
+    // { label: "Pending Submissions", value: 12, icon: "⏳", color: "bg-red-100 text-red-800" },
     // { label: "Pass Rate", value: "72%", icon: "📈", color: "bg-teal-100 text-teal-800" },
-    { label: "Avg Completion Time", value: "42 min", icon: "⏱️", color: "bg-gray-100 text-gray-800" },
+    // { label: "Avg Completion Time", value: "42 min", icon: "⏱️", color: "bg-gray-100 text-gray-800" },
   ];
 
 
@@ -62,7 +59,7 @@ const ExamSummaryDashboard = () => {
       if (!exam) return
       updateExam({ id: exam.id, payload: { status: 'completed' } })
       setTimeout(() => {
-         setConfirmModal({ show: false, action: "", examId: null })
+        setConfirmModal({ show: false, action: "", examId: null })
       }, 1000);
     } else {
       if (!exam) return
@@ -78,7 +75,7 @@ const ExamSummaryDashboard = () => {
   const statusColors = {
     scheduled: "bg-yellow-100 text-yellow-800",
     active: "bg-green-100 text-green-800",
-    completed: "bg-gray-200 text-gray-700",
+    completed: "bg-green-700 text-white",
   };
 
   return (
@@ -86,9 +83,9 @@ const ExamSummaryDashboard = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">📊 Exam Summary Dashboard</h2>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
         {examStats.map((stat) => (
-          <div key={stat.label} className={`rounded-xl shadow-md p-6 flex items-center gap-4 ${stat.color}`}>
+          <div key={stat.label} className={`rounded-xl shadow-md py-3 px-4 flex items-center gap-4 ${stat.color}`}>
             <div className="text-3xl">{stat.icon}</div>
             <div>
               <h3 className="text-lg font-semibold">{stat.label}</h3>
@@ -108,26 +105,40 @@ const ExamSummaryDashboard = () => {
                 <h4 className="font-semibold text-gray-800 dark:text-white">{exam.title}</h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(new Date(exam.start_date))}  • {formatDate(new Date(exam.end_date))}</p>
               </div>
-              <div className="flex items-center gap-4">
-                <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColors[exam.status as keyof typeof statusColors]}`}>
-                  {exam.status.charAt(0).toUpperCase() + exam.status.slice(1)}
-                </span>
-                {exam.status === "scheduled" && (
-                  <button
-                    onClick={() => handleConfirm("start", exam)}
-                    className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm"
-                  >
-                    Start
-                  </button>
-                )}
-                {exam.status === "active" && (
-                  <button
-                    onClick={() => handleConfirm("end", exam)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
-                  >
-                    End
-                  </button>
-                )}
+              <div className="flex items-center gap-4 *:sm:flex-row flex-col">
+                <div>
+                  <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColors[exam.status as keyof typeof statusColors]}`}>
+                    {exam.status.charAt(0).toUpperCase() + exam.status.slice(1)}
+                  </span>
+                  {exam.status === "scheduled" && (
+                    <button
+                      onClick={() => handleConfirm("start", exam)}
+                      className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm"
+                    >
+                      Start
+                    </button>
+                  )}
+                  {exam.status === "active" && (
+                    <button
+                      onClick={() => handleConfirm("end", exam)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
+                    >
+                      End
+                    </button>
+                  )}
+                </div>
+                <div className="flex justify-between gap-4">
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 font-bold font-satoshi">
+                      Start Time:
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 font-bold font-satoshi">
+                      End Time:
+                    </span>
+                  </div>
+                </div>
               </div>
             </li>
           ))}
@@ -135,7 +146,7 @@ const ExamSummaryDashboard = () => {
       </div>
 
       {/* Category Breakdown */}
-      <div>
+      {/* <div>
         <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">🗂️ Exam Categories</h3>
         <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
           {categoryBreakdown.map((cat) => (
@@ -145,7 +156,7 @@ const ExamSummaryDashboard = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Confirmation Modal */}
       {confirmModal.show && (

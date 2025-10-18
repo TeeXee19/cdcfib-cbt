@@ -122,7 +122,7 @@ export async function remove(id: string) {
 }
 
 
-export async function exam():Promise<ExamPayload> {
+export async function exam(): Promise<ExamPayload> {
   const result = await sendRequest("GET", `${APIs.EXAMINEE}/exam`, {});
 
   if (result?.status !== "success") {
@@ -130,4 +130,15 @@ export async function exam():Promise<ExamPayload> {
   }
 
   return result.data;
+}
+
+export async function submitExam(payload: any) {
+  const result = await sendRequest("POST", `answers`, payload, false);
+
+  if (result?.status !== "success") {
+    throw new Error(result?.data ?? result?.message);
+  }
+
+  return result.data;
+
 }

@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
-import { useExamineeExamQuery, useUpdateExaminee } from "../../hooks/useExamineeHooks";
+import { useExamineeExamQuery, useSubmitExam, useUpdateExaminee } from "../../hooks/useExamineeHooks";
 import { ExamineeSessionPayload } from "../../types/examinee.dto";
-
-// import Echo from 'laravel-echo';
-// import Pusher from 'pusher-js';
 import { formatTime } from "../../helpers/utils";
-// import { useDeleteExam } from "../../hooks/useExam";
 
 
 const ExamInterface = () => {
@@ -19,15 +15,17 @@ const ExamInterface = () => {
     const [_, setExamStartDate] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showTimerModal, setShowTimerModal] = useState(false);
     const [showResumeModal, setShowResumeModal] = useState(false);
-    const questionsPerPage = 2;
+    const questionsPerPage = 4;
     const storedUser = localStorage.getItem("examinee");
     const initialUser = storedUser ? JSON.parse(storedUser) : null;
     const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
     const { data: exam } = useExamineeExamQuery(user?.id as string);
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
 
-    // Detect saved session
+    const { mutate: submitExam } = useSubmitExam()
+
     useEffect(() => {
         const savedAnswers = localStorage.getItem("examAnswers");
         const savedPage = localStorage.getItem("examPage");
@@ -44,7 +42,7 @@ const ExamInterface = () => {
         if (!examStarted) return;
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
-                if (prev === 15 * 60) setShowConfirmModal(true);
+                if (prev === 15 * 60) setShowTimerModal(true);
                 if (prev <= 1) {
                     clearInterval(timer);
                     handleSubmit();
@@ -88,7 +86,7 @@ const ExamInterface = () => {
     const isExamTime = () => {
         if (!exam) return false;
         return exam.status == 'active'
-    }   
+    }
 
     useEffect(() => {
         if (!exam?.start_date) return;
@@ -159,6 +157,13 @@ const ExamInterface = () => {
         localStorage.removeItem("examPage");
         document.exitFullscreen?.();
         console.log("Submitted answers:", answers);
+
+        const payload = Object.entries(answers).map(([key, value]) => ({
+            question_id: Number(key),
+            answer: value,
+        }));
+
+        submitExam(payload)
     };
 
     const paginatedQuestions = questions.slice(
@@ -220,6 +225,7 @@ const ExamInterface = () => {
                                 : "bg-gray-400 text-gray-700 cursor-not-allowed"
                                 }`}
                         >
+
                             Start Exam
                         </button>
                     </div>
@@ -246,11 +252,11 @@ const ExamInterface = () => {
                         </button>
                     </div>
                 ) : (
-                    <div className=" space-y-8 overflow-y-auto max-h-[calc(100vh-12rem)] pb-24">
+                    <div className="overflow-y-auto max-h-[calc(100vh-12rem)] grid grid-cols-2 gap-4 mx-6 mb-32 p-2">
                         {paginatedQuestions.map((q) => {
 
                             return (
-                                <div key={q.id} className="bg-white dark:bg-[#1A1B1F] w-[50%] p-6 rounded-xl shadow-md mx-auto">
+                                <div key={q.id} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md ">
                                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
                                         {q.id}. {q.question_text}
                                     </h3>
@@ -397,6 +403,27 @@ const ExamInterface = () => {
                                 className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg"
                             >
                                 Start Fresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showTimerModal && !submitted && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-red-500 dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full">
+                        <h2 className="text-xl font-bold text-white dark:text-white mb-4">
+                            ⏳ 15 Minutes Remaining
+                        </h2>
+                        <p className="text-white dark:text-gray-300 mb-6">
+                            You have 15 minutes left to complete your exam. Please review your answers.
+                        </p>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={() => setShowTimerModal(false)}
+                                className="px-4 py-2 bg-black/30 dark:bg-gray-700 text-gray-800 dark:text-white rounded hover:bg-black/40 dark:hover:bg-gray-600"
+                            >
+                                Continue
                             </button>
                         </div>
                     </div>
