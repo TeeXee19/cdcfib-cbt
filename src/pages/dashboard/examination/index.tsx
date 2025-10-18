@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
-import { handleInputChange, handleSubmitForm } from "../../../helpers/utils";
+import { handleInputChange } from "../../../helpers/utils";
 import { ExamPayload } from "../../../types/exam.dto";
 
 const ExamDashboard = () => {
