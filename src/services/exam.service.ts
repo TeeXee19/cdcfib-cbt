@@ -35,8 +35,8 @@ export async function list(
   return result.data;
 }
 
-export async function create(payload: ExamPayload) {
-    const result = await sendRequest("POST", `${APIs.EXAM}`, payload);
+export async function create(payload:any) {
+    const result = await sendRequest("POST", `${APIs.EXAM}`, payload, true);
     if (result?.status !== 'success') {
         throw new Error(result?.data ?? result?.message);
     }

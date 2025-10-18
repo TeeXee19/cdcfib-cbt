@@ -23,7 +23,7 @@ const ExamInterface = () => {
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<number, any>>({});
 
-    // const [username, setUsername] = useState('')
+    const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
     const [timeLeft] = useState(EXAM_DURATION);
     const [currentPage, setCurrentPage] = useState(0);
@@ -57,11 +57,11 @@ const ExamInterface = () => {
         setUser(initialUser);
     }, []);
 
-    // useEffect(() => {
-    //     if (user) {
-    //         setUsername(user.first_name)
-    //     }
-    // }, [user])
+    useEffect(() => {
+        if (user) {
+            setUsername(user.first_name)
+        }
+    }, [user])
 
     const handleStartExam = () => {
         setExamStarted(true); // this will trigger the query
@@ -145,7 +145,7 @@ const ExamInterface = () => {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-green-700 text-white shadow-md">
                 <div className="flex justify-between items-center px-6 py-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
-                        <span className="font-semibold text-lg">Welcome, {initialUser}</span>
+                        <span className="font-semibold text-lg">Welcome, {username}</span>
                         {examStarted && !submitted && (
                             <span className="text-sm sm:text-base">Page {currentPage + 1} of {totalPages}</span>
                         )}

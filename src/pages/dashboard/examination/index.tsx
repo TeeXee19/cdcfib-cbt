@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
-import { handleInputChange, handleSubmitForm } from "../../../helpers/utils";
+import { handleInputChange } from "../../../helpers/utils";
 import { ExamPayload } from "../../../types/exam.dto";
 
 const ExamDashboard = () => {
@@ -14,6 +14,7 @@ const ExamDashboard = () => {
     end_date: "",
     duration: 0,
     status: 'scheduled',
+    question_file: ''
   });
 
   const { data: exams } = useExamListQuery(0, 10, '', 'id', 'asc')
@@ -49,6 +50,58 @@ const ExamDashboard = () => {
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
+
+
+  // function setQuestionFile(arg0: null) {
+  //   throw new Error("Function not implemented.");
+  // }
+
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFormData: React.Dispatch<React.SetStateAction<any>>,
+    formData: any
+  ) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
+
+    // Optional: validate file type
+    const allowedTypes = [".csv", ".xlsx"];
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    if (!fileExtension || !allowedTypes.includes(`.${fileExtension}`)) {
+      alert("Invalid file type. Only CSV or XLSX allowed.");
+      return;
+    }
+
+    setFormData({
+      ...formData,
+      question_file: file,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (key === "question_file" && value instanceof File) {
+            data.append("file", value);
+          } else {
+            data.append(key, value.toString());
+          }
+        }
+      });
+
+      const result = await CreateExam(data); // call your API
+      // showToast("success", "Exam uploaded successfully!");
+      console.log("Upload result:", result);
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      // showToast("error", error.message || "Failed to upload exam.");
+    }
+  };
 
   return (
     <div className="p-6 md:p-10 bg-gray-50 dark:bg-[#101110] min-h-screen">
@@ -110,7 +163,7 @@ const ExamDashboard = () => {
 
       {/* Exam Creation Form */}
       {showForm && (
-        <form onSubmit={(e) => handleSubmitForm(CreateExam)(e, formData)} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md">
           <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
             {editingId ? "✏️ Edit Exam" : "📝 Create New Exam"}
           </h3>
@@ -208,7 +261,7 @@ const ExamDashboard = () => {
                 id="question_file"
                 name="question_file"
                 accept=".csv,.xlsx"
-                onChange={(e) => handleInputChange(e, setFormData, formData)}
+                onChange={() => handleFileChange}
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#2A2B2F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
