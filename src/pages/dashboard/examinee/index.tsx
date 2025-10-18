@@ -1,5 +1,6 @@
 import  { useState } from "react";
 import { useExamineeListQuery } from "../../../hooks/useExamineeHooks";
+import { formatDate } from "../../../helpers/utils";
 
 const CandidateExamStatus = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -85,7 +86,7 @@ const CandidateExamStatus = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">🧑‍💻 Candidate Exam Status</h2>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <input
           type="text"
           placeholder="Search by candidate, exam, or status..."
@@ -121,7 +122,7 @@ const CandidateExamStatus = () => {
           <option value="Commissioned">Commissioned</option>
           <option value="Non-commissioned">Non-commissioned</option>
         </select>
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="overflow-x-auto shadow-lg rounded-lg border border-gray-300 dark:border-gray-700">
@@ -149,7 +150,7 @@ const CandidateExamStatus = () => {
                 <td className="px-4 py-3 text-gray-800 dark:text-white">{row.candidate_type}</td>
                 <td className="px-4 py-3">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
                       row.status === "Active"
                         ? "bg-green-100 text-green-800"
                         : row.status === "Submitted"
@@ -161,7 +162,7 @@ const CandidateExamStatus = () => {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-gray-800 dark:text-white">{row.time_left || 0}</td>
-                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.created_at}</td>
+                <td className="px-4 py-3 text-gray-800 dark:text-white">{formatDate(new Date(row.created_at))}</td>
                 <td className="px-4 py-3 text-gray-800 dark:text-white">{row.candidate_type}</td>
               </tr>
             ))}
