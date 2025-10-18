@@ -5,7 +5,7 @@ import { ExamineeSessionPayload } from "../../types/examinee.dto";
 // import Echo from 'laravel-echo';
 // import Pusher from 'pusher-js';
 import { formatTime } from "../../helpers/utils";
-import { useDeleteExam } from "../../hooks/useExam";
+// import { useDeleteExam } from "../../hooks/useExam";
 
 // declare global {
 //     interface Window {
@@ -78,7 +78,7 @@ const ExamInterface = () => {
     const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0);
-    const [examStartDate, setExamStartDate] = useState(0);
+    const [_, setExamStartDate] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showResumeModal, setShowResumeModal] = useState(false);
@@ -163,7 +163,8 @@ const ExamInterface = () => {
 
     const isExamTime = () => {
         if (!exam) return false;
-        return new Date(exam.start_date) <= new Date() && new Date(exam.end_date) >= new Date()
+        return exam.status != 'active'
+        // return new Date(exam.start_date) <= new Date() && new Date(exam.end_date) >= new Date()
     }
 
     // const handleNext = () => {
@@ -259,11 +260,11 @@ const ExamInterface = () => {
                     {examStarted && !submitted && (
                         <span className="font-mono text-lg animate-pulse">Time Left: {formatTime(timeLeft)}</span>
                     )}
-                    {!examStarted && !submitted && (
+                    {/* {!examStarted && !submitted && (
                         <span className="font-mono text-lg animate-pulse">
                             Exam starts in: {formatTime(examStartDate)}
                         </span>
-                    )}
+                    )} */}
 
                 </div>
                 {examStarted && !submitted && (
