@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
-import { ExamineeSessionPayload, QuestionPayload } from "../../types/examinee.dto";
+import { ExamineeSessionPayload } from "../../types/examinee.dto";
 
 // import Echo from 'laravel-echo';
 // import Pusher from 'pusher-js';
@@ -90,7 +90,7 @@ const ExamInterface = () => {
     const initialUser = storedUser ? JSON.parse(storedUser) : null;
     const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
     const { data: exam } = useExamineeExamQuery(user?.id as string);
-    const [visibleQuestions, setVisiblequestions] = useState<QuestionPayload[]>()
+    // const [visibleQuestions, setVisiblequestions] = useState<QuestionPayload[]>()
 
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
 
@@ -152,9 +152,9 @@ const ExamInterface = () => {
         setTimeLeft(Number(user.time_left) * 60)
         setQuestions(parsedQuestions);
 
-        const startIndex = (currentPage - 1) * questionsPerPage;
-        const endIndex = startIndex + questionsPerPage;
-        setVisiblequestions(questions.slice(startIndex, endIndex));
+        // const startIndex = (currentPage - 1) * questionsPerPage;
+        // const endIndex = startIndex + questionsPerPage;
+        // setVisiblequestions(questions.slice(startIndex, endIndex));
     }, [exam]);
 
     const isExamTime = () => {
@@ -162,13 +162,13 @@ const ExamInterface = () => {
         return new Date(exam.start_date) <= new Date() && new Date(exam.end_date) >= new Date()
     }
 
-    const handleNext = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-    };
+    // const handleNext = () => {
+    //     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    // };
 
-    const handlePrevious = () => {
-        if (currentPage > 1) setCurrentPage(currentPage - 1);
-    };
+    // const handlePrevious = () => {
+    //     if (currentPage > 1) setCurrentPage(currentPage - 1);
+    // };
 
     useEffect(() => {
         if (!exam?.start_date) return;

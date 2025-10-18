@@ -162,13 +162,13 @@ const ExamDashboard = () => {
                 {exam.status}
               </span>
               <button
-                onClick={() => handleEdit(exam.id)}
+                // onClick={() => handleEdit(exam.id)}
                 className="text-blue-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Edit
               </button>
               <button
-                onClick={() => handleDelete(exam.id)}
+                // onClick={() => handleDelete(exam.id)}
                 className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Delete
