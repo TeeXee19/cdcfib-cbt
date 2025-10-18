@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { create, list, update, view, deletRExam } from "../services/exam.service";
 import { showToast } from "../helpers/sweetAlert";
-import { ExamPayload, ExamResponse } from "../types/exam.dto";
+import { ExamResponse } from "../types/exam.dto";
 // import { PaginatedResponse } from "../types/apiResponse";
 
 // 📄 LIST Exams
@@ -35,6 +35,7 @@ export function useCreateExam() {
     onSuccess: () => {
       showToast("success", "Exam created successfully");
       queryClient.invalidateQueries({ queryKey: ["exams"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "cardCounts"] });
     },
     onError: (error: Error) => {
       showToast("error", error.message);
@@ -46,7 +47,7 @@ export function useCreateExam() {
 export function useUpdateExam() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: ExamPayload }) =>
+    mutationFn: ({ id, payload }: { id: number; payload: any }) =>
       update(payload, id),
     onSuccess: () => {
       showToast("success", "Exam updated successfully");
@@ -62,7 +63,7 @@ export function useUpdateExam() {
 export function useDeleteExam() {
   const queryClient = useQueryClient();
   return useMutation({
-      mutationFn: ({ id }: { id: number }) =>
+    mutationFn: ({ id }: { id: number }) =>
       deletRExam(id),
     onSuccess: () => {
       showToast("success", "Exam deleted successfully");
