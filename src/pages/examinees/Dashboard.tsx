@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
+import { useExamineeExamQuery, useUpdateExaminee } from "../../hooks/useExamineeHooks";
 import { ExamineeSessionPayload } from "../../types/examinee.dto";
 
 // import Echo from 'laravel-echo';
@@ -7,32 +7,13 @@ import { ExamineeSessionPayload } from "../../types/examinee.dto";
 import { formatTime } from "../../helpers/utils";
 // import { useDeleteExam } from "../../hooks/useExam";
 
-// declare global {
-//     interface Window {
-//         Pusher: typeof Pusher;
-//     }
-// }
-
-
-// const rawQuestions = [
-//     { id: 1, type: "single", text: "Capital of Nigeria?", options: ["Lagos", "Abuja", "Kano", "PH"] },
-//     { id: 2, type: "multiple", text: "Select organs in the human body:", options: ["Liver", "Brain", "Heart", "Lungs"] },
-//     { id: 3, type: "text", text: "Who wrote 'Things Fall Apart'?" },
-//     { id: 4, type: "number", text: "What is 5 + 7?" },
-//     { id: 5, type: "boolean", text: "The sun rises in the east." },
-//     { id: 6, type: "single", text: "Deepest ocean?", options: ["Atlantic", "Indian", "Pacific", "Arctic"] },
-//     { id: 7, type: "multiple", text: "Which are programming languages?", options: ["Python", "HTML", "JavaScript", "CSS"] },
-//     { id: 8, type: "text", text: "Name a Nigerian state that starts with 'K'." },
-//     { id: 9, type: "number", text: "How many days are in a leap year?" },
-//     { id: 10, type: "boolean", text: "Water boils at 100°C." },
-// ];
-
-// const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
 const ExamInterface = () => {
     const [examStarted, setExamStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<number, any>>({});
+
+    const { mutate: updateExam } = useUpdateExaminee()
 
 
     // const countdown = setInterval(() => {
@@ -140,6 +121,7 @@ const ExamInterface = () => {
     const handleStartExam = () => {
         if (!isExamTime()) return
         setExamStarted(true); // this will trigger the query
+        updateExam({ id: user.id, payload: { status: 'active' } })
         document.documentElement.requestFullscreen?.();
         // setTimeLeft(exam ? exam?.duration * 60 : 0); // optional: initialize timer from exam duration
         // setQuestions(shuffleArray(rawQuestions)); // if questions are part of exam object
@@ -163,7 +145,7 @@ const ExamInterface = () => {
 
     const isExamTime = () => {
         if (!exam) return false;
-        return exam.status != 'active'
+        return exam.status == 'active'
         // return new Date(exam.start_date) <= new Date() && new Date(exam.end_date) >= new Date()
     }
 
@@ -294,7 +276,7 @@ const ExamInterface = () => {
                             onClick={() => {
                                 if (isExamTime()) handleStartExam();
                             }}
-                            disabled={!isExamTime()}
+                            // disabled={isExamTime()}
                             className={`font-semibold text-[32px] py-3 px-6 rounded-lg transition-all duration-200 mt-[10%] ${isExamTime()
                                 ? "bg-green-700 hover:bg-green-800 text-white"
                                 : "bg-gray-400 text-gray-700 cursor-not-allowed"
