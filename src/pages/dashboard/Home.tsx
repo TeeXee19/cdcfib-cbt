@@ -18,15 +18,6 @@ const ExamSummaryDashboard = () => {
     setConfirmModal({ show: true, action, examId });
   };
 
-  // const executeAction = () => {
-  //   const { action, examId } = confirmModal;
-  //   setExams((prev) =>
-  //     prev.map((exam) =>
-  //       exam.id === examId ? { ...exam, status: action === "start" ? "active" : "completed" } : exam
-  //     )
-  //   );
-  //   setConfirmModal({ show: false, action: "", examId: null });
-  // };
   const {data:exams} = useExamListQuery(0, 10, '', 'id', 'asc')
 
   const examStats = [
