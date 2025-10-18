@@ -94,7 +94,7 @@ const ExamSummaryDashboard = () => {
             <li key={exam.id} className="bg-white dark:bg-[#1A1B1F] p-4 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h4 className="font-semibold text-gray-800 dark:text-white">{exam.title}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(exam.start_date)} • {formatDate(exam.end_date)}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(new Date(exam.start_date))}  • {formatDate(new Date(exam.end_date))}</p>
               </div>
               <div className="flex items-center gap-4">
                 <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColors[exam.status as keyof typeof statusColors]}`}>

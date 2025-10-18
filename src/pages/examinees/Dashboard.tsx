@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
-import { ExamineeSessionPayload } from "../../types/examinee.dto";
+import { ExamineeSessionPayload, QuestionPayload } from "../../types/examinee.dto";
 
 // import Echo from 'laravel-echo';
 // import Pusher from 'pusher-js';
+import { formatTime } from "../../helpers/utils";
 
 // declare global {
 //     interface Window {
@@ -76,6 +77,7 @@ const ExamInterface = () => {
     const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0);
+    const [examStartDate, setExamStartDate] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showResumeModal, setShowResumeModal] = useState(false);
@@ -88,8 +90,11 @@ const ExamInterface = () => {
     const initialUser = storedUser ? JSON.parse(storedUser) : null;
     const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
     const { data: exam } = useExamineeExamQuery(user?.id as string);
+    const [visibleQuestions, setVisiblequestions] = useState<QuestionPayload[]>()
 
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
+
+
 
 
     // Detect saved session
@@ -124,10 +129,12 @@ const ExamInterface = () => {
     useEffect(() => {
         if (user) {
             setUsername(user.first_name)
+            setTimeLeft(+user.time_left * 60)
         }
     }, [user])
 
     const handleStartExam = () => {
+        if (!isExamTime()) return
         setExamStarted(true); // this will trigger the query
         document.documentElement.requestFullscreen?.();
         // setTimeLeft(exam ? exam?.duration * 60 : 0); // optional: initialize timer from exam duration
@@ -142,9 +149,48 @@ const ExamInterface = () => {
             // parse JSON string into object
             options: JSON.parse(q.options)
         }));
-        setTimeLeft(Number(user.time_left)* 60)
+        setTimeLeft(Number(user.time_left) * 60)
         setQuestions(parsedQuestions);
+
+        const startIndex = (currentPage - 1) * questionsPerPage;
+        const endIndex = startIndex + questionsPerPage;
+        setVisiblequestions(questions.slice(startIndex, endIndex));
     }, [exam]);
+
+    const isExamTime = () => {
+        if (!exam) return false;
+        return new Date(exam.start_date) <= new Date() && new Date(exam.end_date) >= new Date()
+    }
+
+    const handleNext = () => {
+        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    };
+
+    const handlePrevious = () => {
+        if (currentPage > 1) setCurrentPage(currentPage - 1);
+    };
+
+    useEffect(() => {
+        if (!exam?.start_date) return;
+
+        const startTime = new Date(exam.start_date).getTime();
+        const now = Date.now();
+        const diffInSeconds = Math.max(0, Math.floor((startTime - now) / 1000));
+        setExamStartDate(diffInSeconds);
+
+        const interval = setInterval(() => {
+            setExamStartDate((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [exam?.start_date]);
+
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.hidden && examStarted && !submitted) {
@@ -175,11 +221,6 @@ const ExamInterface = () => {
         };
     }, []);
 
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-    };
 
     const handleAnswer = (questionId: number, value: any) => {
         const updated = { ...answers, [questionId]: value };
@@ -217,6 +258,12 @@ const ExamInterface = () => {
                     {examStarted && !submitted && (
                         <span className="font-mono text-lg animate-pulse">Time Left: {formatTime(timeLeft)}</span>
                     )}
+                    {!examStarted && !submitted && (
+                        <span className="font-mono text-lg animate-pulse">
+                            Exam starts in: {formatTime(examStartDate)}
+                        </span>
+                    )}
+
                 </div>
                 {examStarted && !submitted && (
                     <div className="h-1 bg-green-900">
@@ -243,11 +290,13 @@ const ExamInterface = () => {
                         </ul>
                         <button
                             onClick={() => {
-                                handleStartExam()
-                                // setQuestions(shuffleArray(rawQuestions));
-                                // setExamStarted(true);
+                                if (isExamTime()) handleStartExam();
                             }}
-                            className="bg-green-700 hover:bg-green-800 text-white font-semibold text-[32px] py-3 px-6 rounded-lg transition-all duration-200 mt-[10%]"
+                            disabled={!isExamTime()}
+                            className={`font-semibold text-[32px] py-3 px-6 rounded-lg transition-all duration-200 mt-[10%] ${isExamTime()
+                                ? "bg-green-700 hover:bg-green-800 text-white"
+                                : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                                }`}
                         >
                             Start Exam
                         </button>
