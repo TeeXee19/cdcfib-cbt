@@ -13,65 +13,7 @@ const CandidateExamStatus = () => {
 
   const {data:examinee} = useExamineeListQuery(0, 20, '', 'id', 'desc')
 
-  // const [data] = useState([
-  //   {
-  //     candidate: "210045",
-  //     exam: "Recruitment Test",
-  //     status: "Active",
-  //     timeLeft: "32:14",
-  //     lastSync: "09:45 AM",
-  //     type: "Commissioned",
-  //   },
-  //   {
-  //     candidate: "210076",
-  //     exam: "ICT Test",
-  //     status: "Submitted",
-  //     timeLeft: "-",
-  //     lastSync: "09:42 AM",
-  //     type: "Non-commissioned",
-  //   },
-  //   {
-  //     candidate: "210099",
-  //     exam: "Security Clearance",
-  //     status: "Banned",
-  //     timeLeft: "-",
-  //     lastSync: "-",
-  //     type: "Commissioned",
-  //   },
-  //   {
-  //     candidate: "210088",
-  //     exam: "Technical Assessment",
-  //     status: "Active",
-  //     timeLeft: "15:22",
-  //     lastSync: "09:50 AM",
-  //     type: "Non-commissioned",
-  //   },
-  // ]);
-
-  // const filtered = data
-  //   .filter((row) => {
-  //     const matchesSearch =
-  //       row.candidate.includes(searchTerm) ||
-  //       row.exam.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       row.status.toLowerCase().includes(searchTerm.toLowerCase());
-
-  //     const matchesStatus = statusFilter === "all" || row.status === statusFilter;
-  //     const matchesType = typeFilter === "all" || row.type === typeFilter;
-
-  //     return matchesSearch && matchesStatus && matchesType;
-  //   })
-  //   .sort((a, b) => {
-  //     if (!sortField) return 0;
-  //     const valA = a[sortField as keyof typeof a].toString().toLowerCase();
-  //     const valB = b[sortField as keyof typeof b].toString().toLowerCase();
-  //     if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-  //     if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-  //     return 0;
-  //   });
-
-  // const paginated = filtered.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-  // const totalPages = Math.ceil(filtered.length / rowsPerPage);
-
+ 
   const handleSort = (field: string) => {
     if (sortField === field) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -151,9 +93,9 @@ const CandidateExamStatus = () => {
                 <td className="px-4 py-3">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
-                      row.status === "Active"
+                      row.status === "active"
                         ? "bg-green-100 text-green-800"
-                        : row.status === "Submitted"
+                        : row.status === "submitted"
                         ? "bg-blue-100 text-blue-800"
                         : "bg-red-100 text-red-800"
                     }`}

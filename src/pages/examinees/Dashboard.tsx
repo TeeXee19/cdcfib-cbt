@@ -88,7 +88,7 @@ const ExamInterface = () => {
     const isExamTime = () => {
         if (!exam) return false;
         return exam.status == 'active'
-    }
+    }   
 
     useEffect(() => {
         if (!exam?.start_date) return;
@@ -160,6 +160,11 @@ const ExamInterface = () => {
         document.exitFullscreen?.();
         console.log("Submitted answers:", answers);
     };
+
+    const paginatedQuestions = questions.slice(
+    currentPage * questionsPerPage,
+    (currentPage + 1) * questionsPerPage
+);
 
     return (
         <div className="min-h-screen bg-white">
