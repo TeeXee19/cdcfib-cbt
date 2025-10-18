@@ -1,6 +1,6 @@
 import APIs from "../constants/APIs";
 // import { PaginatedResponse } from "../types/apiResponse";
-import { ExamPayload, ExamResponse } from "../types/exam.dto";
+import {  ExamResponse } from "../types/exam.dto";
 import { sendRequest } from "./axios.service";
 
 export async function list(
@@ -43,8 +43,8 @@ export async function create(payload:any) {
     return result.data;
 }
 
-export async function update(payload: ExamPayload, id: string) {
-    const result = await sendRequest("PATCH", `${APIs.EXAM}/${id}`, payload);
+export async function update(payload: any, id: number) {
+    const result = await sendRequest("POST", `${APIs.EXAM}/${id}`, payload, true);
    if (result?.status !== 'success') {
         throw new Error(result?.data ?? result?.message);
     }

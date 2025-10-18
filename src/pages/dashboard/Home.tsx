@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDashboardQuery } from "../../hooks/dashboard.hooks";
-import { useExamListQuery } from "../../hooks/useExam";
+import { useExamListQuery, useUpdateExam } from "../../hooks/useExam";
 import { formatDate } from "../../helpers/utils";
+import { Exam } from "../../types/exam.dto";
 
 const categoryBreakdown = [
   { category: "Commissioned", count: 2 },
@@ -14,11 +15,16 @@ const ExamSummaryDashboard = () => {
 
   const { data: summary } = useDashboardQuery()
 
-  const handleConfirm = (action: string, examId: number) => {
-    setConfirmModal({ show: true, action, examId });
+  const { mutate: updateExam } = useUpdateExam()
+
+  const [exam, setExam] = useState<Exam | null>(null);
+
+  const handleConfirm = (action: string, exam: Exam) => {
+    setExam(exam)
+    setConfirmModal({ show: true, action, examId: exam.id });
   };
 
-  const {data:exams} = useExamListQuery(0, 10, '', 'id', 'asc')
+  const { data: exams } = useExamListQuery(0, 10, '', 'id', 'asc')
 
   const examStats = [
     {
@@ -27,28 +33,34 @@ const ExamSummaryDashboard = () => {
       icon: "📚",
       color: "bg-blue-100 text-blue-800"
     },
-    { 
-      label: "Registered Candidates", 
-      value: summary?.total_examinee, icon: "🧑‍🎓", 
-      color: "bg-green-100 text-green-800" 
+    {
+      label: "Registered Candidates",
+      value: summary?.total_examinee, icon: "🧑‍🎓",
+      color: "bg-green-100 text-green-800"
     },
-    { 
-      label: "Active Exams", 
-      value: summary?.exam_counts.find(f=>f.status == 'active')?.total,
-      icon: "🟢", 
-      color: "bg-yellow-100 text-yellow-800" 
+    {
+      label: "Active Exams",
+      value: summary?.exam_counts.find(f => f.status == 'active')?.total,
+      icon: "🟢",
+      color: "bg-yellow-100 text-yellow-800"
     },
-    { 
-      label: "Results Synced", 
-      value: "80%", 
-      icon: "✅", 
-      color: "bg-purple-100 text-purple-800" 
+    {
+      label: "Results Synced",
+      value: "80%",
+      icon: "✅",
+      color: "bg-purple-100 text-purple-800"
     },
-    { label: "Completed Exams", value: summary?.exam_counts.find(r=>r.status == 'completed')?.total, icon: "📦", color: "bg-indigo-100 text-indigo-800" },
+    { label: "Completed Exams", value: summary?.exam_counts.find(r => r.status == 'completed')?.total, icon: "📦", color: "bg-indigo-100 text-indigo-800" },
     { label: "Pending Submissions", value: 12, icon: "⏳", color: "bg-red-100 text-red-800" },
     // { label: "Pass Rate", value: "72%", icon: "📈", color: "bg-teal-100 text-teal-800" },
     { label: "Avg Completion Time", value: "42 min", icon: "⏱️", color: "bg-gray-100 text-gray-800" },
   ];
+
+
+  const handleStartExa = () => {
+    if (!exam) return
+    updateExam({ id: exam.id, payload: { status: 'active' } })
+  }
 
   useEffect(() => {
 
@@ -93,7 +105,7 @@ const ExamSummaryDashboard = () => {
                 </span>
                 {exam.status === "scheduled" && (
                   <button
-                    onClick={() => handleConfirm("start", exam.id)}
+                    onClick={() => handleConfirm("start", exam)}
                     className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm"
                   >
                     Start
@@ -101,7 +113,7 @@ const ExamSummaryDashboard = () => {
                 )}
                 {exam.status === "active" && (
                   <button
-                    onClick={() => handleConfirm("end", exam.id)}
+                    onClick={() => handleConfirm("end", exam)}
                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
                   >
                     End
@@ -136,7 +148,10 @@ const ExamSummaryDashboard = () => {
             </p>
             <div className="flex justify-center gap-4">
               <button
-                // onClick={executeAction}
+                onClick={() => {
+                  handleStartExa()
+                  // updateExam({ id: exam?.id, payload: { status: '' } })
+                }}
                 className="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 rounded-lg"
               >
                 Yes, Confirm

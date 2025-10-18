@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCreateExam, useDeleteExam, useExamListQuery } from "../../../hooks/useExam";
+import { useCreateExam, useDeleteExam, useExamListQuery, useUpdateExam } from "../../../hooks/useExam";
 import { formatDate, handleInputChange } from "../../../helpers/utils";
-import { ExamPayload } from "../../../types/exam.dto";
+import { Exam, ExamPayload } from "../../../types/exam.dto";
 
 
 const ExamDashboard = () => {
@@ -21,6 +21,11 @@ const ExamDashboard = () => {
   const { data: exams } = useExamListQuery(0, 10, '', 'id', 'asc')
 
   const { mutate: CreateExam } = useCreateExam();
+
+  const [exam, setExam] = useState<Exam | null>(null);
+
+
+  // const { mutate: editExamTrigger } = useUpdateExam()
 
   // const [exams, setExams] = useState([
   //   {
@@ -51,7 +56,9 @@ const ExamDashboard = () => {
   const [editErrors, setEditErrors] = useState<any>({});
   const [editFile, setEditFile] = useState<File | null>(null);
 
-      const {mutate:deleteExam} = useDeleteExam();
+  const { mutate: deleteExam } = useDeleteExam();
+
+  const { mutate: updateExam } = useUpdateExam()
 
 
   // function setQuestionFile(arg0: null) {
@@ -75,11 +82,59 @@ const ExamDashboard = () => {
       return;
     }
 
+    console.log('the upload files', file)
+
     setFormData({
       ...formData,
       question_file: file,
     });
   };
+
+  const handleSubmitEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+
+        Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (key === "question_file" && value instanceof File) {
+            data.append("file", value);
+          } else if (key === "start_date" || key === "end_date") {
+            // Convert to MySQL-compatible format
+            const date = new Date(value);
+            const formatted = date.toISOString().slice(0, 19).replace("T", " ");
+            data.append(key, formatted);
+          } else {
+            data.append(key, value.toString());
+          }
+        }
+      });
+
+      const result = await updateExam({ id: exam?.id || 0, payload: data }); // call your API
+      // showToast("success", "Exam uploaded successfully!");
+      console.log("Upload result:", result);
+      setShowEditModal(false)
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      // showToast("error", error.message || "Failed to upload exam.");
+    }
+  };
+
+  const handleEdit = (exam: Exam) => {
+    setFormData(
+      {
+        title: exam.title,
+        type: exam.type as any,
+        start_date: exam.start_date,
+        end_date: exam.end_date,
+        duration: exam.duration,
+        status: exam.status as any,
+        question_file: ''
+      }
+    )
+    setExam(exam)
+    setShowEditModal(true)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +145,11 @@ const ExamDashboard = () => {
         if (value !== null && value !== undefined) {
           if (key === "question_file" && value instanceof File) {
             data.append("file", value);
+          } else if (key === "start_date" || key === "end_date") {
+            // Convert to MySQL-compatible format
+            const date = new Date(value);
+            const formatted = date.toISOString().slice(0, 19).replace("T", " ");
+            data.append(key, formatted);
           } else {
             data.append(key, value.toString());
           }
@@ -163,13 +223,13 @@ const ExamDashboard = () => {
                 {exam.status}
               </span>
               <button
-                // onClick={() => handleEdit(exam.id)}
+                onClick={() => handleEdit(exam)}
                 className="text-blue-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Edit
               </button>
               <button
-                onClick={() => deleteExam({id:exam.id})}
+                onClick={() => deleteExam({ id: exam.id })}
                 className="text-red-600 hover:underline text-xs border px-3 py-1 rounded-full"
               >
                 Delete
@@ -279,7 +339,7 @@ const ExamDashboard = () => {
                 id="question_file"
                 name="question_file"
                 accept=".csv,.xlsx"
-                onChange={() => handleFileChange}
+                onChange={(e) => handleFileChange(e, setFormData, formData)}
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#2A2B2F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -299,114 +359,122 @@ const ExamDashboard = () => {
 
       {/* Modal Edit Form */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-lg max-w-lg w-full">
-            <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">✏️ Edit Exam</h3>
+        <form onSubmit={handleSubmitEdit}>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-lg max-w-lg w-full">
+              <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">✏️ Edit Exam</h3>
 
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Exam Title"
-                value={editExam.title}
-                onChange={(e) => setEditExam({ ...editExam, title: e.target.value })}
-                className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
-              />
-              {editErrors.title && <p className="text-red-500 text-sm">{editErrors.title}</p>}
-
-              <input
-                type="number"
-                placeholder="Duration (minutes)"
-                value={editExam.duration}
-                onChange={(e) => setEditExam({ ...editExam, duration: Number(e.target.value) })}
-                className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
-              />
-              {editErrors.duration && <p className="text-red-500 text-sm">{editErrors.duration}</p>}
-
-              <input
-                type="datetime-local"
-                value={editExam.start_time}
-                onChange={(e) => setEditExam({ ...editExam, start_time: e.target.value })}
-                className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
-              />
-              <input
-                type="datetime-local"
-                value={editExam.end_time}
-                onChange={(e) => setEditExam({ ...editExam, end_time: e.target.value })}
-                className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
-              />
-              {editErrors.time && <p className="text-red-500 text-sm">{editErrors.time}</p>}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                  📤 Replace Questions File (optional)
-                </label>
+              <div className="space-y-4">
                 <input
-                  type="file"
-                  accept=".csv,.xlsx"
-                  onChange={(e) => setEditFile(e.target.files?.[0] || null)}
+                  type="text"
+                  name="title"
+                  placeholder="Exam Title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange(e, setFormData, formData)}
                   className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
                 />
-                {editFile && (
-                  <p className="mt-1 text-sm text-green-600 dark:text-green-400">
-                    Selected: <strong>{editFile.name}</strong>
-                  </p>
-                )}
+                {editErrors.title && <p className="text-red-500 text-sm">{editErrors.title}</p>}
+
+                <input
+                  type="number"
+                  name="duration"
+                  placeholder="Duration (minutes)"
+                  value={formData.duration}
+                  onChange={(e) => handleInputChange(e, setFormData, formData)}
+                  className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
+                />
+                {editErrors.duration && <p className="text-red-500 text-sm">{editErrors.duration}</p>}
+
+                <input
+                  type="datetime-local"
+                  name="start_date"
+                  value={formData.start_date}
+                  onChange={(e) => handleInputChange(e, setFormData, formData)}
+                  className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
+                />
+                <input
+                  type="datetime-local"
+                  name="end_date"
+                  value={formData.end_date}
+                  onChange={(e) => handleInputChange(e, setFormData, formData)}
+                  className="w-full p-2 border rounded-lg dark:bg-[#2A2B2F] dark:text-white"
+                />
+                {editErrors.time && <p className="text-red-500 text-sm">{editErrors.time}</p>}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+                    📤 Replace Questions File (optional)
+                  </label>
+                  <input
+                    type="file"
+                    id="question_file"
+                    name="question_file"
+                    accept=".csv,.xlsx"
+                    onChange={(e) => handleFileChange(e, setFormData, formData)}
+                    className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#2A2B2F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {editFile && (
+                    <p className="mt-1 text-sm text-green-600 dark:text-green-400">
+                      Selected: <strong>{editFile.name}</strong>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    const errors: any = {};
+                    if (!editExam.title.trim()) errors.title = "Title is required";
+                    if (!editExam.duration || editExam.duration <= 0) errors.duration = "Duration must be positive";
+                    if (new Date(editExam.start_time) >= new Date(editExam.end_time)) {
+                      errors.time = "Start time must be before end time";
+                    }
+
+                    if (Object.keys(errors).length > 0) {
+                      setEditErrors(errors);
+                      return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append("title", editExam.title);
+                    formData.append("duration", editExam.duration.toString());
+                    formData.append("start_time", editExam.start_time);
+                    formData.append("end_time", editExam.end_time);
+                    if (editFile) {
+                      formData.append("questions_file", editFile);
+                    }
+
+                    try {
+                      await fetch(`/api/exams/${editExam.id}`, {
+                        method: "PATCH",
+                        body: formData,
+                      });
+                      toast.success("Exam updated.");
+                    } catch (err) {
+                      toast.error("Failed to update exam.");
+                    }
+
+                    // setExams((prev) =>
+                    //   prev.map((e) => (e.id === editExam.id ? editExam : e))
+                    // );
+                    setShowEditModal(false);
+                    setEditFile(null);
+                  }}
+                  className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-semibold"
+                >
+                  Save Changes
+                </button>
               </div>
             </div>
-
-            <div className="flex justify-end gap-4 mt-6">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  const errors: any = {};
-                  if (!editExam.title.trim()) errors.title = "Title is required";
-                  if (!editExam.duration || editExam.duration <= 0) errors.duration = "Duration must be positive";
-                  if (new Date(editExam.start_time) >= new Date(editExam.end_time)) {
-                    errors.time = "Start time must be before end time";
-                  }
-
-                  if (Object.keys(errors).length > 0) {
-                    setEditErrors(errors);
-                    return;
-                  }
-
-                  const formData = new FormData();
-                  formData.append("title", editExam.title);
-                  formData.append("duration", editExam.duration.toString());
-                  formData.append("start_time", editExam.start_time);
-                  formData.append("end_time", editExam.end_time);
-                  if (editFile) {
-                    formData.append("questions_file", editFile);
-                  }
-
-                  try {
-                    await fetch(`/api/exams/${editExam.id}`, {
-                      method: "PATCH",
-                      body: formData,
-                    });
-                    toast.success("Exam updated.");
-                  } catch (err) {
-                    toast.error("Failed to update exam.");
-                  }
-
-                  // setExams((prev) =>
-                  //   prev.map((e) => (e.id === editExam.id ? editExam : e))
-                  // );
-                  setShowEditModal(false);
-                  setEditFile(null);
-                }}
-                className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-semibold"
-              >
-                Save Changes
-              </button>
-            </div>
           </div>
-        </div>
+        </form>
       )}
 
       {/* Toast Container */}
