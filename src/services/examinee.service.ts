@@ -98,8 +98,8 @@ export async function view(id: string) {
 /**
  * Update an examinee
  */
-export async function update(id: string, payload: Partial<ExamineePayload>) {
-  const result = await sendRequest("PATCH", `${APIs.EXAMINEE}/${id}`, payload, true);
+export async function update(id: string, payload: any) {
+  const result = await sendRequest("POST", `${APIs.EXAMINEE}/${id}`, payload, true);
 
   if (result?.status !== "success") {
     throw new Error(result?.data ?? result?.message);

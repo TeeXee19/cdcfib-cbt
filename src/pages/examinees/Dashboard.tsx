@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useExamineeExamQuery } from "../../hooks/useExamineeHooks";
+import { useExamineeExamQuery, useUpdateExaminee } from "../../hooks/useExamineeHooks";
 import { ExamineeSessionPayload } from "../../types/examinee.dto";
 
 // import Echo from 'laravel-echo';
@@ -7,61 +7,12 @@ import { ExamineeSessionPayload } from "../../types/examinee.dto";
 import { formatTime } from "../../helpers/utils";
 // import { useDeleteExam } from "../../hooks/useExam";
 
-// declare global {
-//     interface Window {
-//         Pusher: typeof Pusher;
-//     }
-// }
-
-
-// const shuffleArray = (array: any[]) => [...array].sort(() => Math.random() - 0.5);
 
 const ExamInterface = () => {
     const [examStarted, setExamStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<number, any>>({});
-
-
-    // const countdown = setInterval(() => {
-    //     setTimeLeft((prev) => {
-    //         const next = prev - 1;
-
-    //         // 🔁 every 10 seconds, push to server
-    //         if (next % 10 === 0) {
-    //             console.log("⏱ Sending timer update:", next);
-    //             echo.connector.pusher.send_event(
-    //                 "client-timer-update",
-    //                 {
-    //                     userId,
-    //                     timeLeft: next,
-    //                 },
-    //                 `private-exam-timer.${userId}`
-    //             );
-    //         }
-
-    //         return next > 0 ? next : 0;
-    //     });
-    //      echo.private(`exam-timer.${userId}`).whisper();
-    // }, 1000);
-
-    // useEffect(() => {
-    //     clearInterval(countdown )
-    // }, [])
-
-    // channel.listen(".timer-updated", (data: any) => {
-    //     console.log("Timer broadcasted from backend:", data);
-    //     //   setTimeRemaining(data.timeRemaining);
-    // });
-
-    // const pusher = echo.connector;
-
-    // Listen for connection state changes
-    // pusher.connection.bind('connected', () => {
-    //     console.log('✅ Connected to WebSocket server!');
-    // });
-
-
-
+    const { mutate: updateExam } = useUpdateExaminee()
     const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0);
@@ -69,24 +20,12 @@ const ExamInterface = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showResumeModal, setShowResumeModal] = useState(false);
-
     const questionsPerPage = 2;
-
-
     const storedUser = localStorage.getItem("examinee");
-
     const initialUser = storedUser ? JSON.parse(storedUser) : null;
     const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
     const { data: exam } = useExamineeExamQuery(user?.id as string);
-
-
-
-    // const [visibleQuestions, setVisiblequestions] = useState<QuestionPayload[]>()
-
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
-
-
-
 
     // Detect saved session
     useEffect(() => {
@@ -127,6 +66,7 @@ const ExamInterface = () => {
     const handleStartExam = () => {
         if (!isExamTime()) return
         setExamStarted(true); // this will trigger the query
+        updateExam({ id: user.id, payload: { status: 'active' } })
         document.documentElement.requestFullscreen?.();
         // setTimeLeft(exam ? exam?.duration * 60 : 0); // optional: initialize timer from exam duration
         // setQuestions(shuffleArray(rawQuestions)); // if questions are part of exam object
@@ -143,24 +83,12 @@ const ExamInterface = () => {
         setTimeLeft(Number(user.time_left) * 60)
         setQuestions(parsedQuestions);
 
-        // const startIndex = (currentPage - 1) * questionsPerPage;
-        // const endIndex = startIndex + questionsPerPage;
-        // setVisiblequestions(questions.slice(startIndex, endIndex));
     }, [exam]);
 
     const isExamTime = () => {
         if (!exam) return false;
-        return exam.status != 'active'
-        // return new Date(exam.start_date) <= new Date() && new Date(exam.end_date) >= new Date()
+        return exam.status == 'active'
     }
-
-    // const handleNext = () => {
-    //     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-    // };
-
-    // const handlePrevious = () => {
-    //     if (currentPage > 1) setCurrentPage(currentPage - 1);
-    // };
 
     useEffect(() => {
         if (!exam?.start_date) return;
@@ -281,7 +209,7 @@ const ExamInterface = () => {
                             onClick={() => {
                                 if (isExamTime()) handleStartExam();
                             }}
-                            disabled={!isExamTime()}
+                            // disabled={isExamTime()}
                             className={`font-semibold text-[32px] py-3 px-6 rounded-lg transition-all duration-200 mt-[10%] ${isExamTime()
                                 ? "bg-green-700 hover:bg-green-800 text-white"
                                 : "bg-gray-400 text-gray-700 cursor-not-allowed"
@@ -403,32 +331,6 @@ const ExamInterface = () => {
                                 </div>
                             )
                         })}
-
-                        {/* Pagination Controls */}
-                        {/* <div className="flex justify-between mt-8">
-                            <button
-                                disabled={currentPage === 0}
-                                onClick={() => goToPage(currentPage - 1)}
-                                className="px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white disabled:opacity-50"
-                            >
-                                Previous
-                            </button>
-                            {currentPage < totalPages - 1 ? (
-                                <button
-                                    onClick={() => goToPage(currentPage + 1)}
-                                    className="px-4 py-2 rounded-lg bg-green-700 text-white hover:bg-green-800"
-                                >
-                                    Next
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => setShowConfirmModal(true)}
-                                    className="px-4 py-2 rounded-lg bg-green-700 text-white hover:bg-green-800"
-                                >
-                                    Submit Exam
-                                </button>
-                            )}
-                        </div> */}
                     </div>
                 )}
                 {examStarted && !submitted && (
