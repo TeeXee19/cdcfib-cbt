@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCreateExam, useExamListQuery } from "../../../hooks/useExam";
-import { handleInputChange } from "../../../helpers/utils";
+import { formatDate, handleInputChange } from "../../../helpers/utils";
 import { ExamPayload } from "../../../types/exam.dto";
 
 const ExamDashboard = () => {
@@ -146,8 +146,9 @@ const ExamDashboard = () => {
           <li key={exam.id} className="bg-white dark:bg-[#1A1B1F] p-4 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{exam.title}</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Duration: {exam.duration} min • {exam.start_date} → {exam.end_date}
+              Duration: {exam.duration} min • {formatDate(new Date(exam.start_date))} → {formatDate(new Date(exam.end_date))}
             </p>
+
             <div className="flex gap-2 mt-2 items-center">
               {/* <span className={ exam.status = "text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800"} clas> */}
               <span className={exam.status === "scheduled" ? "text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-800 capitalize font-bold" :
@@ -200,8 +201,8 @@ const ExamDashboard = () => {
                 className="p-3 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1A1B1F] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select type</option>
-                <option value="commissioned">Commissioned</option>
-                <option value="non_commissioned">Non Commissioned</option>
+                <option value="Commissioned">Commissioned</option>
+                <option value="Non-Commissioned">Non-Commissioned</option>
               </select>
             </div>
 

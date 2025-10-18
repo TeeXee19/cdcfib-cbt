@@ -29,3 +29,29 @@ export function getFirstLetters(str: string) {
 
 export const formatNumber = (num: number) =>
   new Intl.NumberFormat("en-US").format(num);
+
+
+export const formatDate = (date: Date) => {
+  if (!date) return "";
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+};
+
+
+export const formatTime = (seconds: number) => {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  return `${hrs.toString().padStart(2, "0")}:${mins
+    .toString()
+    .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+};
