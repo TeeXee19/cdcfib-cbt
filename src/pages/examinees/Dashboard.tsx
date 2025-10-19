@@ -17,7 +17,7 @@ const ExamInterface = () => {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showTimerModal, setShowTimerModal] = useState(false);
     const [showResumeModal, setShowResumeModal] = useState(false);
-    const questionsPerPage = 4;
+    const questionsPerPage = 6;
     const storedUser = localStorage.getItem("examinee");
     const initialUser = storedUser ? JSON.parse(storedUser) : null;
     const [user, setUser] = useState<ExamineeSessionPayload>(initialUser);
@@ -56,7 +56,7 @@ const ExamInterface = () => {
 
     useEffect(() => {
         if (user) {
-            setUsername(user.first_name)
+            setUsername(user.candidate_number)
             setTimeLeft(+user.time_left * 60)
         }
     }, [user])
@@ -253,12 +253,12 @@ const ExamInterface = () => {
                     </div>
                 ) : (
                     <div className="overflow-y-auto max-h-[calc(100vh-12rem)] grid grid-cols-2 gap-4 mx-6 mb-32 p-2">
-                        {paginatedQuestions.map((q) => {
+                        {paginatedQuestions.map((q, index) => {
 
                             return (
                                 <div key={q.id} className="bg-white dark:bg-[#1A1B1F] p-6 rounded-xl shadow-md ">
                                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-                                        {q.id}. {q.question_text}
+                                       {currentPage * questionsPerPage + index + 1}. {q.question_text}
                                     </h3>
 
                                     {q.question_type === "single_choice" && (
@@ -421,7 +421,7 @@ const ExamInterface = () => {
                         <div className="flex justify-end space-x-3">
                             <button
                                 onClick={() => setShowTimerModal(false)}
-                                className="px-4 py-2 bg-black/30 dark:bg-gray-700 text-gray-800 dark:text-white rounded hover:bg-black/40 dark:hover:bg-gray-600"
+                                className="px-4 py-2 bg-black/30 dark:bg-gray-700 text-white dark:text-white rounded hover:bg-black/40 dark:hover:bg-gray-600"
                             >
                                 Continue
                             </button>

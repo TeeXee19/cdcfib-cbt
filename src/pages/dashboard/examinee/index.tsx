@@ -71,7 +71,7 @@ const CandidateExamStatus = () => {
         <table className="min-w-full bg-white dark:bg-[#1A1B1F] rounded-lg shadow-lg ">
           <thead>
             <tr className="bg-[gray] dark:bg-[gray] text-gray-700 dark:text-white rounded-t-lg">
-              {["candidate", "exam", "status", "timeLeft", "lastSync", "type"].map((field) => (
+              {["candidate", "exam", "status", "lastSync", "type"].map((field) => (
                 <th
                   key={field}
                   className="px-4 py-3 text-left cursor-pointer select-none"
@@ -103,7 +103,7 @@ const CandidateExamStatus = () => {
                     {row.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-800 dark:text-white">{row.time_left || 0}</td>
+                {/* <td className="px-4 py-3 text-gray-800 dark:text-white">{row.time_left || 0}</td> */}
                 <td className="px-4 py-3 text-gray-800 dark:text-white">{formatDate(new Date(row.created_at))}</td>
                 <td className="px-4 py-3 text-gray-800 dark:text-white">{row.candidate_type}</td>
               </tr>
