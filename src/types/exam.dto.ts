@@ -8,6 +8,17 @@ export interface ExamPayload {
   question_file:any
 }
 
+export interface ExamTime {
+  id: number;
+  exam_id: number;
+  start_time: string;   // e.g. "2025-10-19 21:12:43"
+  end_time: string | null;  // can be null if still active
+  status: string;       // e.g. "active", "completed"
+  created_at: string;   // ISO datetime string
+  updated_at: string;   // ISO datetime string
+}
+
+
 export interface Exam {
   id: number;
   title: string;
@@ -20,6 +31,7 @@ export interface Exam {
   created_at: string;
   updated_at: string;
   creator: string | null;
+  exam_times:ExamTime[]
 }
 
 export interface ExamMeta {
@@ -33,4 +45,6 @@ export interface ExamResponse {
   data: Exam[];
   meta: ExamMeta;
 }
+
+
 

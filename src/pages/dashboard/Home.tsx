@@ -139,6 +139,23 @@ const ExamSummaryDashboard = () => {
                     </span>
                   </div>
                 </div>
+                {exam.exam_times.map(t => (
+                  <div className="flex justify-between gap-4">
+                    <div>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 font-bold font-satoshi">
+                        {new Date(t.start_time.replace(' ', 'T')).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 font-bold font-satoshi">
+                        {t.end_time
+                          ? new Date(t.end_time.replace(' ', 'T')).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : '—'}
+                      </span>
+                    </div>
+                  </div>
+
+                ))}
               </div>
             </li>
           ))}
