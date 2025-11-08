@@ -1,6 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import AUTH from "../pages/examinees/Auth";
 import DASHBOARD from "../pages/examinees/Dashboard";
+import WAITING from "../pages/examinees/Waiting";
 
 
 const siteRouter: RouteObject[] = [
@@ -14,6 +15,9 @@ const siteRouter: RouteObject[] = [
   },{
     path: "/exam",
     element: <DASHBOARD />,
+  },{
+    path: "/waiting",
+    element: <WAITING />,
   },
 
   {
