@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-
+import Logo from "@/assets/logo.png";
+ 
 const TTL_SECONDS = 15 * 60; 
 const IDLE_TIMEOUT_MS = 10 * 60 * 1000; 
 
@@ -31,16 +32,6 @@ async function getCanvasHash(): Promise<string> {
   }
 }
 
-async function buildFingerprint(): Promise<string> {
-  const ua = navigator.userAgent || "";
-  const scr = `${screen.width}x${screen.height}x${screen.colorDepth || 0}`;
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-  const canvas = await getCanvasHash();
-  const raw = [ua, scr, tz, canvas].join("||");
-  const enc = new TextEncoder().encode(raw);
-  const buf = await crypto.subtle.digest("SHA-256", enc);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-}
 
 function captureFrame(video: HTMLVideoElement) {
   const w = video.videoWidth || 640;
@@ -102,7 +93,6 @@ function setLocalLock(examNumber: string, sessionId: string) {
     sessionId,
     createdAtSec: nowSec(),
     ttl: TTL_SECONDS,
-    fingerprint: "", // optional
   };
   // check existing
   const raw = localStorage.getItem(key);
@@ -159,17 +149,10 @@ export default function WaitingRoomSecure(): JSX.Element {
   const streamRef = useRef<MediaStream | null>(null);
   const heartbeatRef = useRef<number | null>(null);
   const idleTimerRef = useRef<number | null>(null);
-  const [fingerprint, setFingerprint] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [livenessPercent, setLivenessPercent] = useState<number | null>(null);
 
-  // build fingerprint on mount
-  useEffect(() => {
-    (async () => {
-      setFingerprint(await buildFingerprint());
-    })();
-  }, []);
-
+ 
   // anti-inspect and right-click (permissive for form input focus)
   useEffect(() => {
     const blockContext = (e: MouseEvent) => {
@@ -448,8 +431,6 @@ function stopCamera() {
     setStage("captured");
     setMessage("Liveness check passed. Waiting for admission...");
     setIsLoading(false);
-
-    // in a real app: upload frames + fingerprint + sessionId to server here
   }
 
   function admitAndFinish() {
@@ -484,9 +465,11 @@ function stopCamera() {
       <div className="bg-white w-full max-w-xl rounded-2xl shadow-xl p-6 text-center">
         <div className="flex flex-col items-center mb-6">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-            <svg className="w-10 h-10 text-green-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M12 2 L2 7 V17 L12 22 L22 17 V7z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <img
+            src={Logo}
+            alt="CBT App Logo"
+            className="w-24 sm:w-32 md:w-40 object-contain transition-transform duration-500 hover:scale-105"
+          />
           </div>
           <h1 className="text-2xl font-semibold text-[#005a36] mt-3">Examination Waiting Room</h1>
           <p className="text-gray-500 text-sm mt-1">Identity verification & readiness checks</p>
@@ -651,7 +634,6 @@ function stopCamera() {
               </button>
             </div>
             <div className="mt-3 text-xs text-gray-400">Session ID: {sessionId}</div>
-            <div className="mt-2 text-xs text-gray-400">Fingerprint: {fingerprint?.slice(0, 10)}…</div>
           </>
         )}
 

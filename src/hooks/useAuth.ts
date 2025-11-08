@@ -55,7 +55,7 @@ export function useCandidateLoginMutation() {
       if (data.examinee) {
         setItem('examinee', data.examinee)
       }
-      navigate('/exam', {
+      navigate('/waiting', {
         state: variables
       });
     },
