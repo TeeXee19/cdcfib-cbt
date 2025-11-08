@@ -5,7 +5,7 @@ export default {
     axios.interceptors.request.use(
       (config) => {
         // Add a token to the request headers
-        if (!config.url?.includes("auth")) {
+        if (config.url?.includes("questions") || !config.url?.includes('auth')) {
           const stringToken = localStorage.getItem("token");
           if (stringToken) {
             const token = JSON.parse(stringToken)

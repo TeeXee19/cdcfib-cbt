@@ -119,10 +119,10 @@ export interface PaginatedResponse<T> {
   currentPage: number;
 }
 
-export interface RoleListResponse<T> {
+export interface ApiResponseType2 {
   statusCode: number;
   message: string;
-  data: T;
+  data: any;
 }
 
 export interface IAction {

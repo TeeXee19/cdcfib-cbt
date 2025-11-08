@@ -1,8 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import Logo from "@/assets/logo.png";
- 
-const TTL_SECONDS = 15 * 60; 
-const IDLE_TIMEOUT_MS = 10 * 60 * 1000; 
+import { getItem } from "../../helpers/storage";
+import { Candidate } from "../../types/auth.type";
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useNavigate } from "react-router-dom";
+
+
+
+const TTL_SECONDS = 15 * 60;
+const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
+
+dayjs.extend(duration);
+dayjs.extend(customParseFormat);
 
 function nowSec() {
   return Math.floor(Date.now() / 1000);
@@ -151,45 +162,53 @@ export default function WaitingRoomSecure(): JSX.Element {
   const idleTimerRef = useRef<number | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [livenessPercent, setLivenessPercent] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
+  const [started, setStarted] = useState(false);
+  const [candidate, setCandidate] = useState<Candidate | null>(null);
+  const [candidateNumberVerified, setCandidateNumberVerified] = useState<boolean>(false);
+  const [cameraVerified, setCameraVerified] = useState<boolean>(false);
+  const navigate = useNavigate()
 
- 
+
+
+
   // anti-inspect and right-click (permissive for form input focus)
-  useEffect(() => {
-    const blockContext = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      // allow if clicking inputs or inside forms
-      if (t && (t.closest("input") || t.closest("textarea") || t.closest("form") || t.tagName === "INPUT")) {
-        return;
-      }
-      e.preventDefault();
-    };
-    const blockKeys = (e: KeyboardEvent) => {
-      const key = e.key.toUpperCase();
-      if (key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(key)) || (e.ctrlKey && key === "U")) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
+  // useEffect(() => {
+  //   const blockContext = (e: MouseEvent) => {
+  //     const t = e.target as HTMLElement;
+  //     // allow if clicking inputs or inside forms
+  //     if (t && (t.closest("input") || t.closest("textarea") || t.closest("form") || t.tagName === "INPUT")) {
+  //       return;
+  //     }
+  //     e.preventDefault();
+  //   };
+  //   const blockKeys = (e: KeyboardEvent) => {
+  //     const key = e.key.toUpperCase();
+  //     if (key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(key)) || (e.ctrlKey && key === "U")) {
+  //       e.preventDefault();
+  //       e.stopPropagation();
+  //     }
+  //   };
 
-    document.addEventListener("contextmenu", blockContext);
-    document.addEventListener("keydown", blockKeys, true);
+  //   document.addEventListener("contextmenu", blockContext);
+  //   document.addEventListener("keydown", blockKeys, true);
 
-    // detect devtools by viewport difference (heuristic)
-    const devtoolsChecker = setInterval(() => {
-      const threshold = 160;
-      if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-        // gentle: show message, then reload to break inspection
-        setMessage("Please close developer tools to continue.");
-        setTimeout(() => window.location.reload(), 1400);
-      }
-    }, 1500);
+  //   // detect devtools by viewport difference (heuristic)
+  //   const devtoolsChecker = setInterval(() => {
+  //     const threshold = 160;
+  //     if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+  //       // gentle: show message, then reload to break inspection
+  //       setMessage("Please close developer tools to continue.");
+  //       setTimeout(() => window.location.reload(), 1400);
+  //     }
+  //   }, 1500);
 
-    return () => {
-      document.removeEventListener("contextmenu", blockContext);
-      document.removeEventListener("keydown", blockKeys, true);
-      clearInterval(devtoolsChecker);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("contextmenu", blockContext);
+  //     document.removeEventListener("keydown", blockKeys, true);
+  //     clearInterval(devtoolsChecker);
+  //   };
+  // }, []);
 
   // idle timeout (reset on events)
   useEffect(() => {
@@ -234,90 +253,90 @@ export default function WaitingRoomSecure(): JSX.Element {
 
   /* ------------------ Camera control ------------------ */
 
-async function startCamera(): Promise<boolean> {
-  setMessage(null);
+  async function startCamera(): Promise<boolean> {
+    setMessage(null);
 
-  if (!navigator.mediaDevices?.getUserMedia) {
-    setMessage("Camera access is not supported in this browser.");
-    return false;
-  }
-
-  // Stop any existing camera stream
-  stopCamera();
-
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const hasCam = devices.some(d => d.kind === "videoinput");
-    if (!hasCam) {
-      setMessage("No camera detected on this device.");
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMessage("Camera access is not supported in this browser.");
       return false;
     }
 
-    const constraints: MediaStreamConstraints = {
-      video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
-      audio: false,
-    };
+    // Stop any existing camera stream
+    stopCamera();
 
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-    if (!stream.getVideoTracks().length) {
-      setMessage("Camera detected but no video track available.");
-      stream.getTracks().forEach(t => t.stop());
-      return false;
-    }
-
-    streamRef.current = stream;
-
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
-      videoRef.current.muted = true;         // must be set BEFORE play() for autoplay
-      videoRef.current.playsInline = true;   // essential for iOS Safari
-      videoRef.current.load();               // helps trigger playback in some browsers
-
-      try {
-        await videoRef.current.play();
-      } catch (err: any) {
-        console.warn("Video autoplay failed:", err);
-        setMessage("Cannot start camera automatically. Click 'Start Verification' again.");
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const hasCam = devices.some(d => d.kind === "videoinput");
+      if (!hasCam) {
+        setMessage("No camera detected on this device.");
         return false;
       }
+
+      const constraints: MediaStreamConstraints = {
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      if (!stream.getVideoTracks().length) {
+        setMessage("Camera detected but no video track available.");
+        stream.getTracks().forEach(t => t.stop());
+        return false;
+      }
+
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.muted = true;         // must be set BEFORE play() for autoplay
+        videoRef.current.playsInline = true;   // essential for iOS Safari
+        videoRef.current.load();               // helps trigger playback in some browsers
+
+        try {
+          await videoRef.current.play();
+        } catch (err: any) {
+          console.warn("Video autoplay failed:", err);
+          setMessage("Cannot start camera automatically. Click 'Start Verification' again.");
+          return false;
+        }
+      }
+
+      return true;
+    } catch (err: any) {
+      console.error("startCamera error:", err);
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+
+      if (err.name === "NotAllowedError") {
+        setMessage("Camera permission denied. Please allow access to continue.");
+      } else if (err.name === "NotFoundError") {
+        setMessage("No camera found. Please connect a camera.");
+      } else {
+        setMessage("Unable to access camera. Ensure your browser supports webcam access.");
+      }
+
+      return false;
     }
-
-    return true;
-  } catch (err: any) {
-    console.error("startCamera error:", err);
-
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
-    }
-
-    if (err.name === "NotAllowedError") {
-      setMessage("Camera permission denied. Please allow access to continue.");
-    } else if (err.name === "NotFoundError") {
-      setMessage("No camera found. Please connect a camera.");
-    } else {
-      setMessage("Unable to access camera. Ensure your browser supports webcam access.");
-    }
-
-    return false;
   }
-}
-function stopCamera() {
-  try {
-    const s = streamRef.current;
-    if (s) {
-      s.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
+  function stopCamera() {
+    try {
+      const s = streamRef.current;
+      if (s) {
+        s.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.srcObject = null;
+      }
+    } catch (err) {
+      console.warn("stopCamera error:", err);
     }
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.srcObject = null;
-    }
-  } catch (err) {
-    console.warn("stopCamera error:", err);
   }
-}
 
   /* ------------------ Session & Liveness flow ------------------ */
 
@@ -331,6 +350,16 @@ function stopCamera() {
       setIsLoading(false);
       return;
     }
+
+    if (examNumber != candidate?.candidateNumber) {
+      // console.log(examinee.candidateNumber)
+      setMessage("Please enter a valid exam number.");
+      setIsLoading(false);
+      return;
+    }
+
+    setCandidateNumberVerified(true)
+    setMessage(null)
 
     // Try to set lock in localStorage (single active session per examNumber)
     const sid = generateSessionId();
@@ -437,10 +466,10 @@ function stopCamera() {
     // simulate admit: clean lock and redirect to exam
     removeLocalLock(examNumber);
     stopCamera();
+    navigate('/exam')
     if (heartbeatRef.current) window.clearInterval(heartbeatRef.current);
     alert("You have been admitted. Redirecting to exam...");
-    // TODO: navigate to exam route
-    // e.g., navigate(`/exam/${examNumber}?session=${sessionId}`);
+    
   }
 
   navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
@@ -453,10 +482,50 @@ function stopCamera() {
   });
 
   useEffect(() => {
-  if (videoRef.current) {
-    startCamera();
-  }
-}, []);
+    if (videoRef.current) {
+      startCamera();
+    }
+    const examinee: Candidate = getItem('examinee')
+    setCandidate(examinee)
+  }, []);
+
+  useEffect(() => {
+    if (!candidate) return;
+
+    const examStart = candidate.examTime.split('-')[0].trim(); // e.g. "09:00PM"
+    const examDateTime = dayjs(
+      `${dayjs(candidate.examDate).format('YYYY-MM-DD')} ${examStart}`,
+      'YYYY-MM-DD hh:mm A'
+    );
+
+    const interval = setInterval(() => {
+      const now = dayjs();
+      const diff = examDateTime.diff(now, 'minutes');
+      console.log(diff)
+      if(!candidateNumberVerified) {
+         setMessage("Candidate Number not verified yet.");
+        // alert('You have not verified your candidate number')
+        // return
+      }
+      if (diff <= 0) {
+        if(candidateNumberVerified){
+          navigate('/')
+        }
+        setStarted(true);
+        clearInterval(interval);
+        admitAndFinish()
+      } else {
+        const d = dayjs.duration(diff);
+        setTimeLeft({
+          hours: d.hours(),
+          minutes: d.minutes(),
+          seconds: d.seconds(),
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [candidate]);
 
   /* ------------------ UI ------------------ */
 
@@ -466,10 +535,10 @@ function stopCamera() {
         <div className="flex flex-col items-center mb-6">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
             <img
-            src={Logo}
-            alt="CBT App Logo"
-            className="w-24 sm:w-32 md:w-40 object-contain transition-transform duration-500 hover:scale-105"
-          />
+              src={Logo}
+              alt="CBT App Logo"
+              className="w-24 sm:w-32 md:w-40 object-contain transition-transform duration-500 hover:scale-105"
+            />
           </div>
           <h1 className="text-2xl font-semibold text-[#005a36] mt-3">Examination Waiting Room</h1>
           <p className="text-gray-500 text-sm mt-1">Identity verification & readiness checks</p>
@@ -525,14 +594,14 @@ function stopCamera() {
             <h2 className="text-lg font-semibold text-gray-700 mb-3">Camera Preview</h2>
             <div className="mx-auto w-[300px] h-[300px]  bg-black rounded-full overflow-hidden">
               <video
-  ref={videoRef}
-  className="w-full h-full object-cover bg-black border border-white"
-  autoPlay
-  muted
-  playsInline
-/>
+                ref={videoRef}
+                className="w-full h-full object-cover bg-black border border-white"
+                autoPlay
+                muted
+                playsInline
+              />
 
-{/* <video autoPlay muted playsInline width="640" height="480" ></video> */}
+              {/* <video autoPlay muted playsInline width="640" height="480" ></video> */}
 
             </div>
 

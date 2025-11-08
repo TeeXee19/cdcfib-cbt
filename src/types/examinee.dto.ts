@@ -60,5 +60,35 @@ export interface CreateAnswerPayload {
 }
 
 
+export interface Exam {
+  id: string;
+  name: string;
+  startDate: string; // ISO date string
+  endDate: string;   // ISO date string
+  startTime: string; // e.g. "09:00AM"
+  endTime: string;   // e.g. "10:45AM"
+  createdAt: string;
+  updatedAt: string;
+  archived: boolean;
+  questions: Question[];
+}
+
+export interface Question {
+  id: string;
+  question: string;
+  questionType: string; // e.g. "single_choice"
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
+  optionE: string | null;
+  correctOption: string;
+  marks: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+
 
 

@@ -52,8 +52,8 @@ export function useCandidateLoginMutation() {
         setItem('token', data.accessToken)
         showToast('success', "User login successfully");
       }
-      if (data.examinee) {
-        setItem('examinee', data.examinee)
+      if (data.candidate) {
+        setItem('examinee', data.candidate)
       }
       navigate('/waiting', {
         state: variables

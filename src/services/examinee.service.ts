@@ -1,7 +1,7 @@
 import APIs from "../constants/APIs";
 import { PaginatedResponse } from "../types/apiResponse";
-import { ExamineePayload, ExamPayload } from "../types/examinee.dto";
-import { sendRequest } from "./axios.service";
+import { Exam, ExamineePayload, ExamPayload } from "../types/examinee.dto";
+import { sendRequest, sendRequestCandiate } from "./axios.service";
 
 /**
  * List all examinees
@@ -122,10 +122,10 @@ export async function remove(id: string) {
 }
 
 
-export async function exam(): Promise<ExamPayload> {
-  const result = await sendRequest("GET", `${APIs.EXAMINEE}/exam`, {});
+export async function exam(): Promise<Exam> {
+  const result = await sendRequestCandiate("GET", `exam-auth/questions`, {});
 
-  if (result?.status !== "success") {
+  if (result?.statusCode !== 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -133,9 +133,9 @@ export async function exam(): Promise<ExamPayload> {
 }
 
 export async function submitExam(payload: any) {
-  const result = await sendRequest("POST", `answers`, payload, false);
+  const result = await sendRequestCandiate("POST", `answer`, payload, false);
 
-  if (result?.status !== "success") {
+  if (result?.statusCode !== 200) {
     throw new Error(result?.data ?? result?.message);
   }
 

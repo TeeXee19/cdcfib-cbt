@@ -12,7 +12,7 @@ export interface ForgotPasswordType {
 }
 
 export interface ExamineeAccessPayload {
-  phone_number: string;
+  phoneNumber: string;
   nin: string;
 }
 
@@ -41,6 +41,29 @@ export interface ResetPasswordType extends PasswordType {
   email: string;
   code:string
 }
+
+export interface LoginResponseType{
+    accessToken: string;
+    candidate: Candidate;
+  }
+
+export interface Candidate {
+  id: string;
+  lastName: string;
+  firstName: string;
+  nin: string;
+  phoneNumber: string;
+  candidateNumber: string;
+  status: string | null;
+  lastSync: string | null;
+  timeLeft: string | null;
+  candidateType: string;
+  examDate: string; // ISO date string
+  examTime: string; // e.g. "08:00PM - 09:45PM"
+  createdAt: string;
+  updatedAt: string;
+}
+
 
 export interface VerificationDto {
   username: string;
