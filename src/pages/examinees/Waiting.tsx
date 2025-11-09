@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/assets/logo.png";
-import { getItem } from "../../helpers/storage";
+import { getItem, setItem } from "../../helpers/storage";
 import { Candidate } from "../../types/auth.type";
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useNavigate } from "react-router-dom";
+import { useUpdateStatus } from "../../hooks/useExamineeHooks";
 
 
 
@@ -161,6 +162,7 @@ export default function WaitingRoomSecure(): JSX.Element {
   const heartbeatRef = useRef<number | null>(null);
   const idleTimerRef = useRef<number | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const { mutate: updateExamStatus } = useUpdateStatus()
   // const [livenessPercent, setLivenessPercent] = useState<number | null>(null);
   // const [ setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
   // const [ setStarted] = useState(false);
@@ -371,10 +373,10 @@ export default function WaitingRoomSecure(): JSX.Element {
       setStage("error");
       return;
     }
-    
+
     // setStage("preview"); // first set stage
     // setTimeout(() => initCameraPreview(), 50); // give React a tick to render video
-    
+
     setSessionId(sid);
 
     // Start heartbeat: refresh lock TTL in localStorage on interval
@@ -464,6 +466,14 @@ export default function WaitingRoomSecure(): JSX.Element {
     setStage("captured");
     setMessage("Liveness check passed. Waiting for admission...");
     setIsLoading(false);
+    updateExamStatus({ status: 'VERIFIED' })
+    setCandidate(prev => {
+      if (!prev) return prev; // or handle null however you want
+      setItem('examinee', { ...prev, status: 'VERIFIED' })
+      return { ...prev, status: 'VERIFIED' };
+    });
+
+
   }
 
   function admitAndFinish() {
@@ -473,48 +483,56 @@ export default function WaitingRoomSecure(): JSX.Element {
     navigate('/exam')
     if (heartbeatRef.current) window.clearInterval(heartbeatRef.current);
     // alert("You have been admitted. Redirecting to exam...");
-    
+
   }
 
- async function initCameraPreview() {
-  if (!videoRef.current) return;
+  async function initCameraPreview() {
+    if (!videoRef.current) return;
 
-  try {
-    stopCamera(); // stop any existing stream
+    try {
+      stopCamera(); // stop any existing stream
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", width: 640, height: 480 },
-      audio: false,
-    });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: 640, height: 480 },
+        audio: false,
+      });
 
-    streamRef.current = stream;
+      streamRef.current = stream;
 
-    videoRef.current.srcObject = stream;
-    videoRef.current.muted = true;
-    videoRef.current.playsInline = true;
+      videoRef.current.srcObject = stream;
+      videoRef.current.muted = true;
+      videoRef.current.playsInline = true;
 
-    await videoRef.current.play();
-    console.log("✅ Camera initialized successfully");
-  } catch (err: any) {
-    console.error("Camera init failed:", err);
-    setMessage("Unable to access camera. Please allow permission or check your device.");
+      await videoRef.current.play();
+      console.log("✅ Camera initialized successfully");
+    } catch (err: any) {
+      console.error("Camera init failed:", err);
+      setMessage("Unable to access camera. Please allow permission or check your device.");
+    }
   }
-}
 
 
   useEffect(() => {
-  const examinee: Candidate = getItem('examinee');
-  setCandidate(examinee);
+    const examinee: Candidate = getItem('examinee');
+    setCandidate(examinee);
 
-  // Only start camera if stage is "preview" and video element exists
-  if (stage === "preview") {
-    startCamera();
-  }
+    if (examinee.status == 'VERIFIED') {
+      setStage('waiting')
+      return
+    } else if (examinee.status == 'EXAM_ONGOING') {
+      admitAndFinish()
+      return
+    }
 
-  return () => {
-    stopCamera(); // cleanup on unmount
-  };
-}, [stage]);
+    // Only start camera if stage is "preview" and video element exists
+    if (stage === "preview") {
+      startCamera();
+    }
+
+    return () => {
+      stopCamera(); // cleanup on unmount
+    };
+  }, [stage]);
 
   useEffect(() => {
     if (!candidate) return;
@@ -529,13 +547,13 @@ export default function WaitingRoomSecure(): JSX.Element {
       const now = dayjs();
       const diff = examDateTime.diff(now, 'minutes');
       console.log(diff)
-      if(!candidateNumberVerified) {
-         setMessage("Candidate Number not verified yet.");
+      if (!candidateNumberVerified) {
+        setMessage("Candidate Number not verified yet.");
         // alert('You have not verified your candidate number')
         // return
       }
       if (diff <= 0) {
-        if(candidateNumberVerified){
+        if (candidateNumberVerified) {
           navigate('/')
         }
         // setStarted(true);

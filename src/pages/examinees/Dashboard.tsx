@@ -39,6 +39,7 @@ const ExamInterface = () => {
 
     const { mutate: submitExam } = useSubmitExam()
 
+
     useEffect(() => {
         const savedAnswers = localStorage.getItem("examAnswers");
         const savedPage = localStorage.getItem("examPage");
