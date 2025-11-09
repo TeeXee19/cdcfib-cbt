@@ -38,7 +38,7 @@ const ExamInterface = () => {
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
     const [feedback, setFeedback] = useState<SubmitAnswerPayload[]>([])
     const [paginatedQuestions, setPaginatedQuestions] = useState<any[]>([])
-      const { mutate: updateExamStatus } = useUpdateStatus()
+    const { mutate: updateExamStatus } = useUpdateStatus()
     const navigate = useNavigate()
 
     const { mutate: submitExam } = useSubmitExam()
@@ -119,6 +119,7 @@ const ExamInterface = () => {
 
 
 
+
         const examStart = user.examTime.split('-')[1].trim(); // e.g. "09:00PM"
         const examDateTime = dayjs(
             `${dayjs(user.examDate).format('YYYY-MM-DD')} ${examStart}`,
@@ -128,7 +129,6 @@ const ExamInterface = () => {
         const now = dayjs();
         const diff = examDateTime.diff(now, 'minutes');
         setTimeLeft(diff * 60)
-
         const interval = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
@@ -168,6 +168,7 @@ const ExamInterface = () => {
             setExamStartDate((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
+                    handleSubmit()
                     return 0;
                 }
                 return prev - 1;
@@ -381,14 +382,14 @@ const ExamInterface = () => {
         navigate('/')
     };
 
-    useEffect(() => {
-        if (timeLeft <= 0) return
-        const timer = setInterval(() => {
-            setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
+    // useEffect(() => {
+    //     if (timeLeft <= 0) return
+    //     const timer = setInterval(() => {
+    //         setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+    //     }, 1000);
 
-        return () => clearInterval(timer);
-    }, [timeLeft])
+    //     return () => clearInterval(timer);
+    // }, [timeLeft])
 
 
 
