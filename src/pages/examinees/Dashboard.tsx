@@ -57,34 +57,6 @@ const ExamInterface = () => {
     }, []);
 
     useEffect(() => {
-        if (!examStarted) return;
-
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev === 15 * 60) setShowTimerModal(true);
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    // handleSubmit();
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [examStarted]);
-
-    useEffect(() => {
-        if (user) {
-            setUsername(user.candidateNumber)
-            setTimeLeft(Number(user?.timeLeft) * 60)
-        }
-    }, [user])
-
-    // useEffect(() => {
-    //     console.log('paginated questions are', paginatedQuestions)
-    // }, [paginatedQuestions])
-
-    useEffect(() => {
         if (!exam) return;
 
         const parsedQuestions = exam.questions.map((q: any) => ({
@@ -104,22 +76,6 @@ const ExamInterface = () => {
 
         setPaginatedQuestions(exam.questions.slice(startIndex, endIndex));
 
-
-        // setPaginatedQuestions(questions.slice(
-        //     currentPage * questionsPerPage,
-        //     (currentPage + 1) * questionsPerPage
-        // ));
-
-        // useEffect(() => {
-
-        // }, [timeLeft]);
-
-
-
-
-
-
-
         const examStart = user.examTime.split('-')[1].trim(); // e.g. "09:00PM"
         const examDateTime = dayjs(
             `${dayjs(user.examDate).format('YYYY-MM-DD')} ${examStart}`,
@@ -133,20 +89,12 @@ const ExamInterface = () => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
+                    handleSubmit()
                     return 0;
                 }
                 return prev - 1;
             });
         }, 1000);
-        // const interval = setInterval(() => {
-
-        //     // console.log(diff)
-        //     if (diff <= 0) {
-        //         // handleSubmit()
-        //         // return
-        //     }
-        //     setTimeLeft(Number(diff) * 60)
-        // }, 1000);
 
         setExaStarted(true)
         setQuestions(parsedQuestions);
@@ -156,27 +104,27 @@ const ExamInterface = () => {
     }, [exam]);
 
 
-    useEffect(() => {
-        if (!exam?.startDate) return;
+    // useEffect(() => {
+    //     if (!exam?.startDate) return;
 
-        const startTime = new Date(exam.startDate).getTime();
-        const now = Date.now();
-        const diffInSeconds = Math.max(0, Math.floor((startTime - now) / 1000));
-        setExamStartDate(diffInSeconds);
+    //     const startTime = new Date(exam.startDate).getTime();
+    //     const now = Date.now();
+    //     const diffInSeconds = Math.max(0, Math.floor((startTime - now) / 1000));
+    //     setExamStartDate(diffInSeconds);
 
-        const interval = setInterval(() => {
-            setExamStartDate((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    // handleSubmit()
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+    //     const interval = setInterval(() => {
+    //         setExamStartDate((prev) => {
+    //             if (prev <= 1) {
+    //                 clearInterval(interval);
+    //                 // handleSubmit()
+    //                 return 0;
+    //             }
+    //             return prev - 1;
+    //         });
+    //     }, 1000);
 
-        return () => clearInterval(interval);
-    }, [exam?.startDate]);
+    //     return () => clearInterval(interval);
+    // }, [exam?.startDate]);
 
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -377,7 +325,7 @@ const ExamInterface = () => {
         await updateExamStatus({ status: 'EXAM_COMPLETED' })
         // localStorage.removeItem("examAnswers");
         // localStorage.removeItem("examPage");
-        localStorage.clear();
+        // localStorage.clear();
 
         navigate('/')
     };

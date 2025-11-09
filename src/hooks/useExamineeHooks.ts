@@ -98,7 +98,10 @@ export function useUpdateStatus() {
   // const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updatestatus,
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      if(variables.status == 'EXAM_COMPLETED'){
+        localStorage.clear()
+      }
       // showToast("success", "Examinee created successfully");
       // queryClient.invalidateQueries({ queryKey: ["examinees"] });
     },
