@@ -441,16 +441,16 @@ export default function WaitingRoomSecure(): JSX.Element {
     const frame2 = captureFrame(videoRef.current);
 
     // quick approx diff
-    let percent = 0;
-    try {
-      percent = await approxImageDiffPercent(frame1, frame2);
-      // setLivenessPercent(percent);
-    } catch (err) {
-      // if processing fails, allow retry
-      setMessage("Unable to process frames. Please try again.");
-      setIsLoading(false);
-      return;
-    }
+    // let percent = 0;
+    // try {
+    //   percent = await approxImageDiffPercent(frame1, frame2);
+    //   // setLivenessPercent(percent);
+    // } catch (err) {
+    //   // if processing fails, allow retry
+    //   setMessage("Unable to process frames. Please try again.");
+    //   setIsLoading(false);
+    //   return;
+    // }
 
     // threshold: require small movement (>= ~4%)
     // if (percent < 4) {
