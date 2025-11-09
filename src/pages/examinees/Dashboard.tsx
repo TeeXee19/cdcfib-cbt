@@ -59,7 +59,7 @@ const ExamInterface = () => {
                 if (prev === 15 * 60) setShowTimerModal(true);
                 if (prev <= 1) {
                     clearInterval(timer);
-                    handleSubmit();
+                    // handleSubmit();
                     return 0;
                 }
                 return prev - 1;
@@ -93,11 +93,12 @@ const ExamInterface = () => {
         const now = dayjs();
         const diff = examDateTime.diff(now, 'minutes');
         if (diff <= 0) {
-            handleSubmit()
+            // handleSubmit()
             return
         }
         setTimeLeft(Number(diff) * 60)
         setQuestions(parsedQuestions);
+        document.documentElement.requestFullscreen?.();
 
     }, [exam]);
 
@@ -127,7 +128,7 @@ const ExamInterface = () => {
         const handleVisibilityChange = () => {
             if (document.hidden && examStarted && !submitted) {
                 alert("⚠️ You switched tabs or minimized the window.");
-                handleSubmit()
+                // handleSubmit()
             }
         };
         document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -301,7 +302,7 @@ const ExamInterface = () => {
     const handleSubmit = () => {
         setSubmitted(true);
 
-        // document.exitFullscreen?.();
+        document.exitFullscreen?.();
         console.log("Submitted answers:", answers);
 
         // const payload = Object.entries(answers).map(([key, value]) => ({
