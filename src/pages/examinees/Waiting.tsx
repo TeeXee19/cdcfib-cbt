@@ -55,43 +55,43 @@ function captureFrame(video: HTMLVideoElement) {
   return canvas.toDataURL("image/jpeg", 0.8);
 }
 
-async function approxImageDiffPercent(dataUrlA: string, dataUrlB: string) {
-  // load images
-  const loadImg = (src: string) =>
-    new Promise<HTMLImageElement>((res, rej) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => res(img);
-      img.onerror = rej;
-      img.src = src;
-    });
+// async function approxImageDiffPercent(dataUrlA: string, dataUrlB: string) {
+//   // load images
+//   const loadImg = (src: string) =>
+//     new Promise<HTMLImageElement>((res, rej) => {
+//       const img = new Image();
+//       img.crossOrigin = "anonymous";
+//       img.onload = () => res(img);
+//       img.onerror = rej;
+//       img.src = src;
+//     });
 
-  const [imgA, imgB] = await Promise.all([loadImg(dataUrlA), loadImg(dataUrlB)]);
-  const w = Math.min(imgA.width, imgB.width);
-  const h = Math.min(imgA.height, imgB.height);
+//   const [imgA, imgB] = await Promise.all([loadImg(dataUrlA), loadImg(dataUrlB)]);
+//   const w = Math.min(imgA.width, imgB.width);
+//   const h = Math.min(imgA.height, imgB.height);
 
-  const c = document.createElement("canvas");
-  c.width = w;
-  c.height = h;
-  const ctx = c.getContext("2d")!;
+//   const c = document.createElement("canvas");
+//   c.width = w;
+//   c.height = h;
+//   const ctx = c.getContext("2d")!;
 
-  ctx.drawImage(imgA, 0, 0, w, h);
-  const a = ctx.getImageData(0, 0, w, h).data;
-  ctx.clearRect(0, 0, w, h);
-  ctx.drawImage(imgB, 0, 0, w, h);
-  const b = ctx.getImageData(0, 0, w, h).data;
+//   ctx.drawImage(imgA, 0, 0, w, h);
+//   const a = ctx.getImageData(0, 0, w, h).data;
+//   ctx.clearRect(0, 0, w, h);
+//   ctx.drawImage(imgB, 0, 0, w, h);
+//   const b = ctx.getImageData(0, 0, w, h).data;
 
-  let diffCount = 0;
-  const step = 8; // sample every Nth pixel to reduce CPU
-  for (let i = 0; i < a.length; i += 4 * step) {
-    const dr = Math.abs(a[i] - b[i]);
-    const dg = Math.abs(a[i + 1] - b[i + 1]);
-    const db = Math.abs(a[i + 2] - b[i + 2]);
-    if (dr + dg + db > 30) diffCount++;
-  }
-  const totalSamples = Math.ceil((a.length / 4) / step);
-  return (diffCount / totalSamples) * 100;
-}
+//   let diffCount = 0;
+//   const step = 8; // sample every Nth pixel to reduce CPU
+//   for (let i = 0; i < a.length; i += 4 * step) {
+//     const dr = Math.abs(a[i] - b[i]);
+//     const dg = Math.abs(a[i + 1] - b[i + 1]);
+//     const db = Math.abs(a[i + 2] - b[i + 2]);
+//     if (dr + dg + db > 30) diffCount++;
+//   }
+//   const totalSamples = Math.ceil((a.length / 4) / step);
+//   return (diffCount / totalSamples) * 100;
+// }
 
 
 function makeLockKey(examNumber: string) {
@@ -436,7 +436,7 @@ export default function WaitingRoomSecure(): JSX.Element {
       return;
     }
 
-    const frame1 = captureFrame(videoRef.current);
+    // const frame1 = captureFrame(videoRef.current);
     await new Promise(r => setTimeout(r, 900));
     const frame2 = captureFrame(videoRef.current);
 
