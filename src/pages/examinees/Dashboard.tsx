@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useExamineeExamQuery, useSubmitExam} from "../../hooks/useExamineeHooks";
+import { useExamineeExamQuery, useSubmitExam } from "../../hooks/useExamineeHooks";
 import { formatTime } from "../../helpers/utils";
 import { Candidate } from "../../types/auth.type";
 import { useNavigate } from "react-router-dom";
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Question } from "../../types/examinee.dto";
 export interface SubmitAnswerPayload {
     examId: string;
     candidateId: string;
@@ -19,7 +20,7 @@ dayjs.extend(customParseFormat);
 const ExamInterface = () => {
     const [examStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
-    const [answers, setAnswers] = useState<Record<number, any>>({});
+    const [answers, setAnswers] = useState<Record<any, any>>({});
     // const { mutate: updateExam } = useUpdateExaminee()
     const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
@@ -35,6 +36,7 @@ const ExamInterface = () => {
     const { data: exam } = useExamineeExamQuery(user?.id as string);
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
     const [feedback, setFeedback] = useState<SubmitAnswerPayload[]>([])
+    const [paginatedQuestions, setPaginatedQuestions] = useState<any[]>([])
     const navigate = useNavigate()
 
     const { mutate: submitExam } = useSubmitExam()
@@ -76,6 +78,10 @@ const ExamInterface = () => {
     }, [user])
 
     useEffect(() => {
+        console.log('paginated questions are', paginatedQuestions)
+    }, [paginatedQuestions])
+
+    useEffect(() => {
         if (!exam) return;
 
         const parsedQuestions = exam.questions.map((q: any) => ({
@@ -83,6 +89,24 @@ const ExamInterface = () => {
             // parse JSON string into object
             // options: JSON.parse(q.options)
         }));
+        console.log('answers pulled are', exam)
+        if (exam.answers) {
+            setAnswers(exam.answers)
+        }
+
+        // console.log(exam.questions)
+
+        const startIndex = currentPage * questionsPerPage;
+        const endIndex = startIndex + questionsPerPage;
+
+        setPaginatedQuestions(exam.questions.slice(startIndex, endIndex));
+
+
+        // setPaginatedQuestions(questions.slice(
+        //     currentPage * questionsPerPage,
+        //     (currentPage + 1) * questionsPerPage
+        // ));
+
 
         const examStart = user.examTime.split('-')[0].trim(); // e.g. "09:00PM"
         const examDateTime = dayjs(
@@ -294,8 +318,15 @@ const ExamInterface = () => {
     };
 
     const goToPage = (page: number) => {
+
+        if (!exam) return
+
+        const startIndex = page * questionsPerPage;
+        const endIndex = startIndex + questionsPerPage;
+
+        setPaginatedQuestions(exam.questions.slice(startIndex, endIndex));
         setCurrentPage(page);
-        localStorage.setItem("examPage", page.toString());
+        // localStorage.setItem("examPage", page.toString());
         submitExam(feedback)
     };
 
@@ -324,12 +355,7 @@ const ExamInterface = () => {
         timeLeft
     }, [timeLeft])
 
-    const paginatedQuestions = questions.slice(
-        currentPage * questionsPerPage,
-        (currentPage + 1) * questionsPerPage
-    );
 
-    
 
     return (
         <div className="min-h-screen bg-white">
@@ -561,70 +587,70 @@ const ExamInterface = () => {
             )}
 
             {/* Floating Video Feed (Draggable, Non-Minimizable) */}
-<video
-  ref={(ref) => {
-    if (ref && !ref.srcObject) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: false })
-        .then((stream) => {
-          ref.srcObject = stream;
-          ref.play().catch(() => {});
-        })
-        .catch((err) => console.error("Camera access denied:", err));
-    }
-  }}
-  id="examCam"
-  className="fixed top-8 left-6 w-40 h-40 sm:w-32 sm:h-32 rounded-lg shadow-lg border-2 border-black object-cover cursor-move z-[9999] transition-all duration-300 ease-in-out"
-  style={{ touchAction: "none" }}
-  // Removed tap-to-minimize behavior
-  onClick={() => {
-    // Do nothing on click
-  }}
-  onMouseDown={(e) => {
-    const video = e.currentTarget;
-    video.style.position = "fixed";
-    const rect = video.getBoundingClientRect();
-    const shiftX = e.clientX - rect.left;
-    const shiftY = e.clientY - rect.top;
+            <video
+                ref={(ref) => {
+                    if (ref && !ref.srcObject) {
+                        navigator.mediaDevices
+                            .getUserMedia({ video: true, audio: false })
+                            .then((stream) => {
+                                ref.srcObject = stream;
+                                ref.play().catch(() => { });
+                            })
+                            .catch((err) => console.error("Camera access denied:", err));
+                    }
+                }}
+                id="examCam"
+                className="fixed top-8 left-6 w-40 h-40 sm:w-32 sm:h-32 rounded-lg shadow-lg border-2 border-black object-cover cursor-move z-[9999] transition-all duration-300 ease-in-out"
+                style={{ touchAction: "none" }}
+                // Removed tap-to-minimize behavior
+                onClick={() => {
+                    // Do nothing on click
+                }}
+                onMouseDown={(e) => {
+                    const video = e.currentTarget;
+                    video.style.position = "fixed";
+                    const rect = video.getBoundingClientRect();
+                    const shiftX = e.clientX - rect.left;
+                    const shiftY = e.clientY - rect.top;
 
-    const moveAt = (pageX: number, pageY: number) => {
-      video.style.left = pageX - shiftX + "px";
-      video.style.top = pageY - shiftY + "px";
-    };
+                    const moveAt = (pageX: number, pageY: number) => {
+                        video.style.left = pageX - shiftX + "px";
+                        video.style.top = pageY - shiftY + "px";
+                    };
 
-    const onMouseMove = (event: MouseEvent) => moveAt(event.pageX, event.pageY);
-    document.addEventListener("mousemove", onMouseMove);
+                    const onMouseMove = (event: MouseEvent) => moveAt(event.pageX, event.pageY);
+                    document.addEventListener("mousemove", onMouseMove);
 
-    document.onmouseup = () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      document.onmouseup = null;
-    };
-  }}
-  onTouchStart={(e) => {
-    const video = e.currentTarget;
-    video.style.position = "fixed";
-    const touch = e.touches[0];
-    const rect = video.getBoundingClientRect();
-    const shiftX = touch.clientX - rect.left;
-    const shiftY = touch.clientY - rect.top;
+                    document.onmouseup = () => {
+                        document.removeEventListener("mousemove", onMouseMove);
+                        document.onmouseup = null;
+                    };
+                }}
+                onTouchStart={(e) => {
+                    const video = e.currentTarget;
+                    video.style.position = "fixed";
+                    const touch = e.touches[0];
+                    const rect = video.getBoundingClientRect();
+                    const shiftX = touch.clientX - rect.left;
+                    const shiftY = touch.clientY - rect.top;
 
-    const moveAt = (pageX: number, pageY: number) => {
-      video.style.left = pageX - shiftX + "px";
-      video.style.top = pageY - shiftY + "px";
-    };
+                    const moveAt = (pageX: number, pageY: number) => {
+                        video.style.left = pageX - shiftX + "px";
+                        video.style.top = pageY - shiftY + "px";
+                    };
 
-    const onTouchMove = (event: TouchEvent) => {
-      const t = event.touches[0];
-      moveAt(t.pageX, t.pageY);
-    };
+                    const onTouchMove = (event: TouchEvent) => {
+                        const t = event.touches[0];
+                        moveAt(t.pageX, t.pageY);
+                    };
 
-    document.addEventListener("touchmove", onTouchMove);
-    document.ontouchend = () => {
-      document.removeEventListener("touchmove", onTouchMove);
-      document.ontouchend = null;
-    };
-  }}
-/>
+                    document.addEventListener("touchmove", onTouchMove);
+                    document.ontouchend = () => {
+                        document.removeEventListener("touchmove", onTouchMove);
+                        document.ontouchend = null;
+                    };
+                }}
+            />
 
         </div>
     );
