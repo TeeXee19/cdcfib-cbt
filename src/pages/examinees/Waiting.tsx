@@ -472,7 +472,7 @@ export default function WaitingRoomSecure(): JSX.Element {
     stopCamera();
     navigate('/exam')
     if (heartbeatRef.current) window.clearInterval(heartbeatRef.current);
-    alert("You have been admitted. Redirecting to exam...");
+    // alert("You have been admitted. Redirecting to exam...");
     
   }
 
