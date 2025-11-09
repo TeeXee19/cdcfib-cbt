@@ -142,3 +142,13 @@ export async function submitExam(payload: any) {
   return result.data;
 
 }
+export async function updatestatus(payload: any) {
+  const result = await sendRequestCandiate("POST", `answer/status`, payload, false);
+
+  if (result?.statusCode !== 200) {
+    throw new Error(result?.data ?? result?.message);
+  }
+
+  return result.data;
+
+}

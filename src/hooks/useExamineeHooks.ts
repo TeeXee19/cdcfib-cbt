@@ -9,6 +9,7 @@ import {
   remove,
   exam,
   submitExam,
+  updatestatus,
 } from "../services/examinee.service";
 import { showToast } from "../helpers/sweetAlert";
 import { ExamineePayload } from "../types/examinee.dto";
@@ -87,6 +88,19 @@ export function useSubmitExam() {
     onSuccess: () => {
       // showToast("success", "Examinee created successfully");
       queryClient.invalidateQueries({ queryKey: ["examinees"] });
+    },
+    onError: (error: Error) => {
+      showToast("error", error.message);
+    },
+  });
+}
+export function useUpdateStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updatestatus,
+    onSuccess: () => {
+      // showToast("success", "Examinee created successfully");
+      // queryClient.invalidateQueries({ queryKey: ["examinees"] });
     },
     onError: (error: Error) => {
       showToast("error", error.message);
