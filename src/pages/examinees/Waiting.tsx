@@ -243,13 +243,13 @@ export default function WaitingRoomSecure(): JSX.Element {
   }, [examNumber]);
 
   // cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopCamera();
-      if (heartbeatRef.current) window.clearInterval(heartbeatRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     stopCamera();
+  //     if (heartbeatRef.current) window.clearInterval(heartbeatRef.current);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   /* ------------------ Camera control ------------------ */
 
@@ -297,7 +297,7 @@ export default function WaitingRoomSecure(): JSX.Element {
           await videoRef.current.play();
         } catch (err: any) {
           console.warn("Video autoplay failed:", err);
-          setMessage("Cannot start camera automatically. Click 'Start Verification' again.");
+          // setMessage("Cannot start camera automatically. Click 'Start Verification' again.");
           return false;
         }
       }
@@ -371,7 +371,10 @@ export default function WaitingRoomSecure(): JSX.Element {
       setStage("error");
       return;
     }
-
+    
+    // setStage("preview"); // first set stage
+    // setTimeout(() => initCameraPreview(), 50); // give React a tick to render video
+    
     setSessionId(sid);
 
     // Start heartbeat: refresh lock TTL in localStorage on interval
@@ -393,6 +396,7 @@ export default function WaitingRoomSecure(): JSX.Element {
     }
 
     setStage("preview");
+    setTimeout(() => initCameraPreview(), 50);
     setIsLoading(false);
   }
 
@@ -472,22 +476,45 @@ export default function WaitingRoomSecure(): JSX.Element {
     
   }
 
-  navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-    const v = document.querySelector("video") as HTMLVideoElement | null;
-    if (v) {
-      v.srcObject = stream;
-    } else {
-      console.warn("No <video> element found to attach stream.");
-    }
-  });
+ async function initCameraPreview() {
+  if (!videoRef.current) return;
+
+  try {
+    stopCamera(); // stop any existing stream
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user", width: 640, height: 480 },
+      audio: false,
+    });
+
+    streamRef.current = stream;
+
+    videoRef.current.srcObject = stream;
+    videoRef.current.muted = true;
+    videoRef.current.playsInline = true;
+
+    await videoRef.current.play();
+    console.log("✅ Camera initialized successfully");
+  } catch (err: any) {
+    console.error("Camera init failed:", err);
+    setMessage("Unable to access camera. Please allow permission or check your device.");
+  }
+}
+
 
   useEffect(() => {
-    if (videoRef.current) {
-      startCamera();
-    }
-    const examinee: Candidate = getItem('examinee')
-    setCandidate(examinee)
-  }, []);
+  const examinee: Candidate = getItem('examinee');
+  setCandidate(examinee);
+
+  // Only start camera if stage is "preview" and video element exists
+  if (stage === "preview") {
+    startCamera();
+  }
+
+  return () => {
+    stopCamera(); // cleanup on unmount
+  };
+}, [stage]);
 
   useEffect(() => {
     if (!candidate) return;
@@ -681,7 +708,7 @@ export default function WaitingRoomSecure(): JSX.Element {
             <h2 className="text-lg font-semibold text-gray-700 mb-2">Verified — Awaiting Admission</h2>
             <p className="text-gray-600 mb-4">You will be admitted into the exam by the proctor when ready.</p>
             <div className="flex gap-3">
-              <button
+              {/* <button
                 onClick={() => {
                   // simulate admin admitting the user (for demo)
                   admitAndFinish();
@@ -689,7 +716,7 @@ export default function WaitingRoomSecure(): JSX.Element {
                 className="flex-1 bg-green-700 hover:bg-green-800 text-white py-2 rounded-lg"
               >
                 Simulate Admit (Demo)
-              </button>
+              </button> */}
               <button
                 onClick={() => {
                   // user cancels

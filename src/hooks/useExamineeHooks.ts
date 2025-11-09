@@ -85,7 +85,7 @@ export function useSubmitExam() {
   return useMutation({
     mutationFn: submitExam,
     onSuccess: () => {
-      showToast("success", "Examinee created successfully");
+      // showToast("success", "Examinee created successfully");
       queryClient.invalidateQueries({ queryKey: ["examinees"] });
     },
     onError: (error: Error) => {
