@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useExamineeExamQuery, useSubmitExam } from "../../hooks/useExamineeHooks";
+import { useExamineeExamQuery, useSubmitExam, useUpdateStatus } from "../../hooks/useExamineeHooks";
 import { formatTime } from "../../helpers/utils";
 import { Candidate } from "../../types/auth.type";
 import { useNavigate } from "react-router-dom";
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { updatestatus } from "../../services/examinee.service";
 // import { Question } from "../../types/examinee.dto";
 export interface SubmitAnswerPayload {
     examId: string;
@@ -37,6 +38,7 @@ const ExamInterface = () => {
     const totalPages = exam ? Math.ceil(exam?.questions?.length / questionsPerPage) : 0;
     const [feedback, setFeedback] = useState<SubmitAnswerPayload[]>([])
     const [paginatedQuestions, setPaginatedQuestions] = useState<any[]>([])
+      const { mutate: updateExamStatus } = useUpdateStatus()
     const navigate = useNavigate()
 
     const { mutate: submitExam } = useSubmitExam()
@@ -371,6 +373,7 @@ const ExamInterface = () => {
 
 
         await submitExam(feedback)
+        await updateExamStatus({ status: 'EXAM_COMPLETED' })
         // localStorage.removeItem("examAnswers");
         // localStorage.removeItem("examPage");
         localStorage.clear();
