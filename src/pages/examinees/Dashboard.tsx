@@ -18,7 +18,7 @@ dayjs.extend(duration);
 dayjs.extend(customParseFormat);
 
 const ExamInterface = () => {
-    const [examStarted] = useState(false);
+    const [examStarted, setExaStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<any, any>>({});
     // const { mutate: updateExam } = useUpdateExaminee()
@@ -56,6 +56,7 @@ const ExamInterface = () => {
 
     useEffect(() => {
         if (!examStarted) return;
+
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev === 15 * 60) setShowTimerModal(true);
@@ -77,9 +78,9 @@ const ExamInterface = () => {
         }
     }, [user])
 
-    useEffect(() => {
-        console.log('paginated questions are', paginatedQuestions)
-    }, [paginatedQuestions])
+    // useEffect(() => {
+    //     console.log('paginated questions are', paginatedQuestions)
+    // }, [paginatedQuestions])
 
     useEffect(() => {
         if (!exam) return;
@@ -89,7 +90,7 @@ const ExamInterface = () => {
             // parse JSON string into object
             // options: JSON.parse(q.options)
         }));
-        console.log('answers pulled are', exam)
+        // console.log('answers pulled are', exam)
         if (exam.answers) {
             setAnswers(exam.answers)
         }
@@ -107,22 +108,48 @@ const ExamInterface = () => {
         //     (currentPage + 1) * questionsPerPage
         // ));
 
+        // useEffect(() => {
 
-        const examStart = user.examTime.split('-')[0].trim(); // e.g. "09:00PM"
+        // }, [timeLeft]);
+
+
+
+
+
+
+        const examStart = user.examTime.split('-')[1].trim(); // e.g. "09:00PM"
         const examDateTime = dayjs(
             `${dayjs(user.examDate).format('YYYY-MM-DD')} ${examStart}`,
-            'YYYY-MM-DD hh:mm A'
+            'YYYY-MM-DD hh:mmA'
         );
 
         const now = dayjs();
         const diff = examDateTime.diff(now, 'minutes');
-        if (diff <= 0) {
-            // handleSubmit()
-            return
-        }
-        setTimeLeft(Number(diff) * 60)
+        setTimeLeft(diff * 60)
+
+        const interval = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        // const interval = setInterval(() => {
+
+        //     // console.log(diff)
+        //     if (diff <= 0) {
+        //         // handleSubmit()
+        //         // return
+        //     }
+        //     setTimeLeft(Number(diff) * 60)
+        // }, 1000);
+
+        setExaStarted(true)
         setQuestions(parsedQuestions);
         document.documentElement.requestFullscreen?.();
+        return () => clearInterval(interval);
 
     }, [exam]);
 
@@ -330,7 +357,7 @@ const ExamInterface = () => {
         submitExam(feedback)
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setSubmitted(true);
 
         document.exitFullscreen?.();
@@ -343,16 +370,21 @@ const ExamInterface = () => {
 
 
 
-        submitExam(feedback)
+        await submitExam(feedback)
         // localStorage.removeItem("examAnswers");
         // localStorage.removeItem("examPage");
-        // localStorage.clear();
+        localStorage.clear();
 
         navigate('/')
     };
 
     useEffect(() => {
-        timeLeft
+        if (timeLeft <= 0) return
+        const timer = setInterval(() => {
+            setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+
+        return () => clearInterval(timer);
     }, [timeLeft])
 
 
