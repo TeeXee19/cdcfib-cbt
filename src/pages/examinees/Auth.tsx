@@ -102,7 +102,7 @@ useEffect(() => {
           window.location.href = "about:blank";
           return true;
         }
-        last = +new Date();
+        // last = +new Date();
         return false;
       };
     })();
