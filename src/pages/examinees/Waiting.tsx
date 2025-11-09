@@ -162,8 +162,8 @@ export default function WaitingRoomSecure(): JSX.Element {
   const idleTimerRef = useRef<number | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [livenessPercent, setLivenessPercent] = useState<number | null>(null);
-  const [ setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
-  const [ setStarted] = useState(false);
+  // const [ setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
+  // const [ setStarted] = useState(false);
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [candidateNumberVerified, setCandidateNumberVerified] = useState<boolean>(false);
   // const [cameraVerified, setCameraVerified] = useState<boolean>(false);
@@ -542,7 +542,7 @@ export default function WaitingRoomSecure(): JSX.Element {
         clearInterval(interval);
         admitAndFinish()
       } else {
-        const d = dayjs.duration(diff);
+        // const d = dayjs.duration(diff);
         // setTimeLeft({
         //   hours: d.hours(),
         //   minutes: d.minutes(),

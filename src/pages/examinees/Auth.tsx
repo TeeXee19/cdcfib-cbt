@@ -79,10 +79,10 @@ useEffect(() => {
 
     // Small "devtools open" detector — heuristic
     const detectDevTools = (() => {
-      let last = +new Date();
+      // let last = +new Date();
       return () => {
         // Heuristic: large difference between outer and inner dims
-        const threshold = 160;
+        // const threshold = 160;
         // if (
         //   (window.outerWidth - window.innerWidth > threshold) ||
         //   (window.outerHeight - window.innerHeight > threshold)
