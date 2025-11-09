@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { updatestatus } from "../../services/examinee.service";
+// import { updatestatus } from "../../services/examinee.service";
 // import { Question } from "../../types/examinee.dto";
 export interface SubmitAnswerPayload {
     examId: string;
