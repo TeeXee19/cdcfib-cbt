@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useExamineeExamQuery, useSubmitExam, useUpdateExaminee } from "../../hooks/useExamineeHooks";
+import { useExamineeExamQuery, useSubmitExam} from "../../hooks/useExamineeHooks";
 import { formatTime } from "../../helpers/utils";
 import { Candidate } from "../../types/auth.type";
 import { useNavigate } from "react-router-dom";
@@ -17,10 +17,10 @@ dayjs.extend(duration);
 dayjs.extend(customParseFormat);
 
 const ExamInterface = () => {
-    const [examStarted, setExamStarted] = useState(false);
+    const [examStarted] = useState(false);
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<number, any>>({});
-    const { mutate: updateExam } = useUpdateExaminee()
+    // const { mutate: updateExam } = useUpdateExaminee()
     const [username, setUsername] = useState('')
     const [submitted, setSubmitted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0);
@@ -199,10 +199,10 @@ const ExamInterface = () => {
 
         // Small "devtools open" detector — heuristic
         const detectDevTools = (() => {
-          let last = +new Date();
+        //   let last = +new Date();
           return () => {
             // Heuristic: large difference between outer and inner dims
-            const threshold = 160;
+            // const threshold = 160;
             // if (
             //   (window.outerWidth - window.innerWidth > threshold) ||
             //   (window.outerHeight - window.innerHeight > threshold)
@@ -222,7 +222,7 @@ const ExamInterface = () => {
               window.location.href = "about:blank";
               return true;
             }
-            last = +new Date();
+            // last = +new Date();
             return false;
           };
         })();

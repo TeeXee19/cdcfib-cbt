@@ -1,6 +1,6 @@
 import APIs from "../constants/APIs";
 import { PaginatedResponse } from "../types/apiResponse";
-import { Exam, ExamineePayload, ExamPayload } from "../types/examinee.dto";
+import { Exam, ExamineePayload } from "../types/examinee.dto";
 import { sendRequest, sendRequestCandiate } from "./axios.service";
 
 /**

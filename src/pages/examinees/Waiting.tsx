@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Logo from "@/assets/logo.png";
 import { getItem } from "../../helpers/storage";
 import { Candidate } from "../../types/auth.type";
@@ -23,25 +23,25 @@ function generateSessionId() {
   return `sess_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
 }
 
-async function getCanvasHash(): Promise<string> {
-  try {
-    const canvas = document.createElement("canvas");
-    canvas.width = 200;
-    canvas.height = 50;
-    const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#f0f0f0";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#111";
-    ctx.font = "16px Arial";
-    ctx.fillText("ExamPortal", 10, 30);
-    const data = canvas.toDataURL();
-    const enc = new TextEncoder().encode(data);
-    const hashBuf = await crypto.subtle.digest("SHA-256", enc);
-    return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, "0")).join("");
-  } catch {
-    return "no-canvas";
-  }
-}
+// async function getCanvasHash(): Promise<string> {
+//   try {
+//     const canvas = document.createElement("canvas");
+//     canvas.width = 200;
+//     canvas.height = 50;
+//     const ctx = canvas.getContext("2d")!;
+//     ctx.fillStyle = "#f0f0f0";
+//     ctx.fillRect(0, 0, canvas.width, canvas.height);
+//     ctx.fillStyle = "#111";
+//     ctx.font = "16px Arial";
+//     ctx.fillText("ExamPortal", 10, 30);
+//     const data = canvas.toDataURL();
+//     const enc = new TextEncoder().encode(data);
+//     const hashBuf = await crypto.subtle.digest("SHA-256", enc);
+//     return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, "0")).join("");
+//   } catch {
+//     return "no-canvas";
+//   }
+// }
 
 
 function captureFrame(video: HTMLVideoElement) {
@@ -162,11 +162,11 @@ export default function WaitingRoomSecure(): JSX.Element {
   const idleTimerRef = useRef<number | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [livenessPercent, setLivenessPercent] = useState<number | null>(null);
-  const [timeLeft, setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
-  const [started, setStarted] = useState(false);
+  const [ setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
+  const [ setStarted] = useState(false);
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [candidateNumberVerified, setCandidateNumberVerified] = useState<boolean>(false);
-  const [cameraVerified, setCameraVerified] = useState<boolean>(false);
+  // const [cameraVerified, setCameraVerified] = useState<boolean>(false);
   const navigate = useNavigate()
 
 
@@ -538,16 +538,16 @@ export default function WaitingRoomSecure(): JSX.Element {
         if(candidateNumberVerified){
           navigate('/')
         }
-        setStarted(true);
+        // setStarted(true);
         clearInterval(interval);
         admitAndFinish()
       } else {
         const d = dayjs.duration(diff);
-        setTimeLeft({
-          hours: d.hours(),
-          minutes: d.minutes(),
-          seconds: d.seconds(),
-        });
+        // setTimeLeft({
+        //   hours: d.hours(),
+        //   minutes: d.minutes(),
+        //   seconds: d.seconds(),
+        // });
       }
     }, 1000);
 

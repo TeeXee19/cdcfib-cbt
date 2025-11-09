@@ -1,8 +1,8 @@
 import APIs from "../constants/APIs";
-import { ApiResponseType2 } from "../types/apiResponse";
+// import { ApiResponseType2 } from "../types/apiResponse";
 // import { AuthData } from "../types/apiResponse";
 import {
-  Candidate,
+  // Candidate,
   ExamineeAccessPayload,
   LoginResponseType,
   LoginType,
