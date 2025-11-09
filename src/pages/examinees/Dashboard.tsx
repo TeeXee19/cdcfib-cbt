@@ -360,7 +360,7 @@ const ExamInterface = () => {
 
             {/* Body */}
             <main className="pt-28 my-auto">
-                <div className="overflow-y-auto max-h-[calc(100vh-12rem)] grid grid-cols-2 gap-4 mx-6 mb-32 p-2">
+                <div className="overflow-y-auto max-h-[calc(100vh-12rem)] grid grid-cols-1 md:grid-cols-2 gap-4 mx-auto md:mx-6 mb-32 p-2">
                     {paginatedQuestions.map((q, index) => {
 
                         return (

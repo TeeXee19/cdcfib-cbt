@@ -723,6 +723,21 @@ export default function WaitingRoomSecure(): JSX.Element {
 
         {stage === "waiting" && (
           <>
+            <p>
+              <strong className="font-bold text-red-600">EXAM INSTRUCTIONS - PLEASE READ BEFORE YOU BEGIN</strong>
+            </p>
+            <ul className="!text-left">
+              <li> 1. You are expected to answer 40 questions within 1 hour.</li>
+              <li>2. Once your exam begins, do not leave the exam screen; any attempt to minimize, close, or switch tabs will be recorded as a violation.</li>
+              <li>3. <strong>3 violations</strong> will result in automatic disqualification.</li>
+              <li>4. Ensure you have stable internet and power supply before your exam starts.</li>
+              <li>5. Your answers are saved automatically as you proceed.</li>
+              <li>6. If you get disconnected, you can rejoin within your allotted time and continue your exam.</li>
+              <li>7. Once your time expires, the system will automatically submit your exam.</li>
+              <li>8. Do not refresh or close the browser during the exam.</li>
+              <li>9. Keep your camera on at all times if prompted for verification.</li>
+            </ul>
+            <br/><br/>
             <h2 className="text-lg font-semibold text-gray-700 mb-2">Verified — Awaiting Admission</h2>
             <p className="text-gray-600 mb-4">You will be admitted into the exam by the proctor when ready.</p>
             <div className="flex gap-3">
@@ -735,7 +750,7 @@ export default function WaitingRoomSecure(): JSX.Element {
               >
                 Simulate Admit (Demo)
               </button> */}
-              <button
+              {/* <button
                 onClick={() => {
                   // user cancels
                   removeLocalLock(examNumber);
@@ -745,9 +760,8 @@ export default function WaitingRoomSecure(): JSX.Element {
                 className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg"
               >
                 Cancel
-              </button>
+              </button> */}
             </div>
-            <div className="mt-3 text-xs text-gray-400">Session ID: {sessionId}</div>
           </>
         )}
 
