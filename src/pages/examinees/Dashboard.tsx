@@ -313,7 +313,7 @@ const ExamInterface = () => {
         submitExam(feedback)
         // localStorage.removeItem("examAnswers");
         // localStorage.removeItem("examPage");
-        localStorage.clear();
+        // localStorage.clear();
 
         navigate('/')
     };
@@ -326,6 +326,8 @@ const ExamInterface = () => {
         currentPage * questionsPerPage,
         (currentPage + 1) * questionsPerPage
     );
+
+    
 
     return (
         <div className="min-h-screen bg-white">
@@ -555,6 +557,73 @@ const ExamInterface = () => {
                     </div>
                 </div>
             )}
+
+            {/* Floating Video Feed (Draggable, Non-Minimizable) */}
+<video
+  ref={(ref) => {
+    if (ref && !ref.srcObject) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: false })
+        .then((stream) => {
+          ref.srcObject = stream;
+          ref.play().catch(() => {});
+        })
+        .catch((err) => console.error("Camera access denied:", err));
+    }
+  }}
+  id="examCam"
+  className="fixed top-8 left-6 w-40 h-40 sm:w-32 sm:h-32 rounded-lg shadow-lg border-2 border-black object-cover cursor-move z-[9999] transition-all duration-300 ease-in-out"
+  style={{ touchAction: "none" }}
+  // Removed tap-to-minimize behavior
+  onClick={() => {
+    // Do nothing on click
+  }}
+  onMouseDown={(e) => {
+    const video = e.currentTarget;
+    video.style.position = "fixed";
+    const rect = video.getBoundingClientRect();
+    const shiftX = e.clientX - rect.left;
+    const shiftY = e.clientY - rect.top;
+
+    const moveAt = (pageX: number, pageY: number) => {
+      video.style.left = pageX - shiftX + "px";
+      video.style.top = pageY - shiftY + "px";
+    };
+
+    const onMouseMove = (event: MouseEvent) => moveAt(event.pageX, event.pageY);
+    document.addEventListener("mousemove", onMouseMove);
+
+    document.onmouseup = () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.onmouseup = null;
+    };
+  }}
+  onTouchStart={(e) => {
+    const video = e.currentTarget;
+    video.style.position = "fixed";
+    const touch = e.touches[0];
+    const rect = video.getBoundingClientRect();
+    const shiftX = touch.clientX - rect.left;
+    const shiftY = touch.clientY - rect.top;
+
+    const moveAt = (pageX: number, pageY: number) => {
+      video.style.left = pageX - shiftX + "px";
+      video.style.top = pageY - shiftY + "px";
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      const t = event.touches[0];
+      moveAt(t.pageX, t.pageY);
+    };
+
+    document.addEventListener("touchmove", onTouchMove);
+    document.ontouchend = () => {
+      document.removeEventListener("touchmove", onTouchMove);
+      document.ontouchend = null;
+    };
+  }}
+/>
+
         </div>
     );
 };
