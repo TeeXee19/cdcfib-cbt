@@ -522,7 +522,7 @@ export default function WaitingRoomSecure(): JSX.Element {
     const examStart = candidate.examTime.split('-')[0].trim(); // e.g. "09:00PM"
     const examDateTime = dayjs(
       `${dayjs(candidate.examDate).format('YYYY-MM-DD')} ${examStart}`,
-      'YYYY-MM-DD hh:mm A'
+      'YYYY-MM-DD hh:mmA'
     );
 
     const interval = setInterval(() => {
