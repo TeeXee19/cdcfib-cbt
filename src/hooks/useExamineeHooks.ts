@@ -95,7 +95,7 @@ export function useSubmitExam() {
   });
 }
 export function useUpdateStatus() {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updatestatus,
     onSuccess: () => {
