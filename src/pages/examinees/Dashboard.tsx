@@ -301,7 +301,7 @@ const ExamInterface = () => {
     const handleSubmit = () => {
         setSubmitted(true);
 
-        document.exitFullscreen?.();
+        // document.exitFullscreen?.();
         console.log("Submitted answers:", answers);
 
         // const payload = Object.entries(answers).map(([key, value]) => ({
