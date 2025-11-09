@@ -168,7 +168,7 @@ const ExamInterface = () => {
             setExamStartDate((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
-                    handleSubmit()
+                    // handleSubmit()
                     return 0;
                 }
                 return prev - 1;
