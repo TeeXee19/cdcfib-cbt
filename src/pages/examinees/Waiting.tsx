@@ -161,7 +161,7 @@ export default function WaitingRoomSecure(): JSX.Element {
   const heartbeatRef = useRef<number | null>(null);
   const idleTimerRef = useRef<number | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [livenessPercent, setLivenessPercent] = useState<number | null>(null);
+  // const [livenessPercent, setLivenessPercent] = useState<number | null>(null);
   // const [ setTimeLeft] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
   // const [ setStarted] = useState(false);
   const [candidate, setCandidate] = useState<Candidate | null>(null);
@@ -407,7 +407,7 @@ export default function WaitingRoomSecure(): JSX.Element {
     const tracks = s.getVideoTracks();
     if (!tracks.length) return { ok: false, reason: "No video track available" };
     const track = tracks[0];
-    if (track.readyState !== "live") return { ok: false, reason: "Track not live" };
+    // if (track.readyState !== "live") return { ok: false, reason: "Track not live" };
     // If browser supports getSettings, check for width/height
     const settings = track.getSettings ? (track.getSettings() as MediaTrackSettings) : null;
     if (settings && (!settings.width || !settings.height)) {
@@ -444,7 +444,7 @@ export default function WaitingRoomSecure(): JSX.Element {
     let percent = 0;
     try {
       percent = await approxImageDiffPercent(frame1, frame2);
-      setLivenessPercent(percent);
+      // setLivenessPercent(percent);
     } catch (err) {
       // if processing fails, allow retry
       setMessage("Unable to process frames. Please try again.");
@@ -453,11 +453,11 @@ export default function WaitingRoomSecure(): JSX.Element {
     }
 
     // threshold: require small movement (>= ~4%)
-    if (percent < 4) {
-      setMessage("Please move slightly (turn head, blink or nod) and try again.");
-      setIsLoading(false);
-      return;
-    }
+    // if (percent < 4) {
+    //   setMessage("Please move slightly (turn head, blink or nod) and try again.");
+    //   setIsLoading(false);
+    //   return;
+    // }
 
     // Save captured image locally (simulate upload) and mark verified
     setCapturedImage(frame2);
@@ -652,9 +652,9 @@ export default function WaitingRoomSecure(): JSX.Element {
               </button>
             </div>
 
-            {livenessPercent !== null && (
+            {/* {livenessPercent !== null && (
               <div className="mt-3 text-sm text-gray-700">Motion detected: {livenessPercent.toFixed(1)}%</div>
-            )}
+            )} */}
             {message && <div className="mt-3 text-sm text-red-600">{message}</div>}
           </>
         )}
@@ -688,7 +688,7 @@ export default function WaitingRoomSecure(): JSX.Element {
                   // retry capture
                   setMessage(null);
                   setCapturedImage(null);
-                  setLivenessPercent(null);
+                  // setLivenessPercent(null);
                   (async () => {
                     const ok = await startCamera();
                     if (ok) setStage("preview");
