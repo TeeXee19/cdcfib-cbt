@@ -98,7 +98,7 @@ export function useUpdateStatus() {
   // const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updatestatus,
-    onSuccess: (data, variables) => {
+    onSuccess: ( variables) => {
       if(variables.status == 'EXAM_COMPLETED'){
         localStorage.clear()
       }
