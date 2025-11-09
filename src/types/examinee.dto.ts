@@ -71,17 +71,18 @@ export interface Exam {
   updatedAt: string;
   archived: boolean;
   questions: Question[];
+  answers:Record<any, any>
 }
 
 export interface Question {
   id: string;
   question: string;
   questionType: string; // e.g. "single_choice"
-  optionA: string;
-  optionB: string;
-  optionC: string;
-  optionD: string;
-  optionE: string | null;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  option_e: string | null;
   correctOption: string;
   marks: number;
   createdAt: string;
