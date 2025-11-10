@@ -175,42 +175,42 @@ export default function WaitingRoomSecure(): JSX.Element {
 
 
   // anti-inspect and right-click (permissive for form input focus)
-  // useEffect(() => {
-  //   const blockContext = (e: MouseEvent) => {
-  //     const t = e.target as HTMLElement;
-  //     // allow if clicking inputs or inside forms
-  //     if (t && (t.closest("input") || t.closest("textarea") || t.closest("form") || t.tagName === "INPUT")) {
-  //       return;
-  //     }
-  //     e.preventDefault();
-  //   };
-  //   const blockKeys = (e: KeyboardEvent) => {
-  //     const key = e.key.toUpperCase();
-  //     if (key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(key)) || (e.ctrlKey && key === "U")) {
-  //       e.preventDefault();
-  //       e.stopPropagation();
-  //     }
-  //   };
+  useEffect(() => {
+    const blockContext = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      // allow if clicking inputs or inside forms
+      if (t && (t.closest("input") || t.closest("textarea") || t.closest("form") || t.tagName === "INPUT")) {
+        return;
+      }
+      e.preventDefault();
+    };
+    const blockKeys = (e: KeyboardEvent) => {
+      const key = e.key.toUpperCase();
+      if (key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(key)) || (e.ctrlKey && key === "U")) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
 
-  //   document.addEventListener("contextmenu", blockContext);
-  //   document.addEventListener("keydown", blockKeys, true);
+    document.addEventListener("contextmenu", blockContext);
+    document.addEventListener("keydown", blockKeys, true);
 
-  //   // detect devtools by viewport difference (heuristic)
-  //   const devtoolsChecker = setInterval(() => {
-  //     const threshold = 160;
-  //     if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-  //       // gentle: show message, then reload to break inspection
-  //       setMessage("Please close developer tools to continue.");
-  //       setTimeout(() => window.location.reload(), 1400);
-  //     }
-  //   }, 1500);
+    // detect devtools by viewport difference (heuristic)
+    const devtoolsChecker = setInterval(() => {
+      const threshold = 160;
+      if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+        // gentle: show message, then reload to break inspection
+        setMessage("Please close developer tools to continue.");
+        setTimeout(() => window.location.reload(), 1400);
+      }
+    }, 1500);
 
-  //   return () => {
-  //     document.removeEventListener("contextmenu", blockContext);
-  //     document.removeEventListener("keydown", blockKeys, true);
-  //     clearInterval(devtoolsChecker);
-  //   };
-  // }, []);
+    return () => {
+      document.removeEventListener("contextmenu", blockContext);
+      document.removeEventListener("keydown", blockKeys, true);
+      clearInterval(devtoolsChecker);
+    };
+  }, []);
 
   // idle timeout (reset on events)
   useEffect(() => {

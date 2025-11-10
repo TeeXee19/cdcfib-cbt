@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import AUTH from "../pages/examinees/Auth";
 import DASHBOARD from "../pages/examinees/Dashboard";
 import WAITING from "../pages/examinees/Waiting";
+import COMPLETED from "../pages/examinees/Completed";
 
 
 const siteRouter: RouteObject[] = [
@@ -18,6 +19,9 @@ const siteRouter: RouteObject[] = [
   },{
     path: "/waiting",
     element: <WAITING />,
+  },{
+    path: "/completed",
+    element: <COMPLETED />,
   },
 
   {
