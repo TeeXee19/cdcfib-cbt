@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ExamineeCard from '../../components/molecules/ExamineeCard';
 import { useCandidateLoginMutation } from '../../hooks/useAuth';
 import { ExamineeAccessPayload } from '../../types/auth.type';
@@ -13,9 +13,17 @@ const Auth = () => {
     phoneNumber: "",
     nin: "",
   });
-  const { mutate: login, isPending:isLoading, error } = useCandidateLoginMutation()
-  
-useEffect(() => {
+  const { mutate: login, isPending: isLoading, error } = useCandidateLoginMutation()
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [captchaText, setCaptchaText] = useState("");
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+  const [captchaValidated, setCaptchaValidated] = useState(false);
+
+  useEffect(() => {
+
+    generateCaptcha()
     // --- Desktop: right click & keys ---
     const blockRightClick = (e: MouseEvent) => e.preventDefault();
 
@@ -39,14 +47,14 @@ useEffect(() => {
     const blockContextMenu = (e: Event) => {
       const target = e.target as HTMLElement;
       if (
-      target.tagName === "INPUT" ||
-      target.tagName === "TEXTAREA" ||
-      target.tagName === "SELECT" ||
-      target.tagName === "BUTTON" ||
-      target.isContentEditable
-    ) {
-      return; // allow context actions for form elements
-    }
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.tagName === "BUTTON" ||
+        target.isContentEditable
+      ) {
+        return; // allow context actions for form elements
+      }
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -117,7 +125,7 @@ useEffect(() => {
 
     // Mobile/touch listeners
     document.addEventListener("touchstart", blockContextMenu, { passive: false });
-    document.addEventListener("touchend", () => {}, { passive: true }); // no-op but keeps touch pipeline predictable
+    document.addEventListener("touchend", () => { }, { passive: true }); // no-op but keeps touch pipeline predictable
     document.addEventListener("gesturestart", blockGesture, { passive: false }); // iOS legacy
     document.addEventListener("copy", blockCopy, true);
     document.addEventListener("cut", blockCopy, true);
@@ -151,6 +159,102 @@ useEffect(() => {
     };
   }, []);
 
+  const generateCaptcha = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Generate random text
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    let text = "";
+    for (let i = 0; i < 5; i++) {
+      text += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCaptchaText(text);
+
+    // Draw background
+    ctx.fillStyle = "#f0f0f0";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw text
+    ctx.font = "30px Arial";
+    ctx.fillStyle = "#333";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    // Add noise lines
+    for (let i = 0; i < 5; i++) {
+      ctx.strokeStyle = `hsl(${Math.random() * 360}, 50%, 50%)`;
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.stroke();
+    }
+
+    // Add noise dots
+    for (let i = 0; i < 20; i++) {
+      ctx.fillStyle = `hsl(${Math.random() * 360}, 50%, 60%)`;
+      ctx.beginPath();
+      ctx.arc(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        2,
+        0,
+        2 * Math.PI
+      );
+      ctx.fill();
+    }
+
+    // Reset states
+    setCaptchaInput("");
+    setCaptchaValidated(false);
+    setCaptchaError("");
+  };
+
+  const validateCaptcha = () => {
+    setCaptchaError("");
+
+    if (!captchaInput.trim()) {
+      setCaptchaError("Please enter the captcha text");
+      return false;
+    }
+
+    const userInput = captchaInput.trim();
+    const correctCaptcha = captchaText;
+
+    if (userInput === correctCaptcha) {
+      setCaptchaValidated(true);
+      setCaptchaError("");
+      // alert("Captcha validated successfully!");
+      return true;
+    } else {
+      setCaptchaValidated(false);
+      setCaptchaError("Incorrect captcha. Please try again.");
+
+      // Generate a new one after 1 second
+      setTimeout(generateCaptcha, 1000);
+      return false;
+    }
+  };
+
+  const handleSubmi = async(e:any)=>{
+    e.preventDefault()
+    await validateCaptcha();
+    if(captchaValidated){
+      handleSubmitForm(login)(e, formData)
+    }else{
+      alert('Captch not verified yet')
+    }
+  }
+
+
+
   return (
     <ExamineeCard
       label="Candidate Login"
@@ -161,7 +265,7 @@ useEffect(() => {
 
 
       <div className="login-container">
-        <form onSubmit={(e) => handleSubmitForm(login)(e, formData)}>
+        <form onSubmit={(e) => handleSubmi(e)}>
           {/* NIN Input Field */}
           <div className="form-group">
             <label htmlFor="nin" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -212,6 +316,54 @@ useEffect(() => {
             </p>
           </div>
 
+          <div className="captcha-container" style={{ textAlign: "center" }}>
+            <div className="flex items-center space-x-4">
+              <canvas
+                ref={canvasRef}
+                width={300}
+                height={30}
+                style={{ border: "1px solid #ccc", borderRadius: "5px" }}
+              />
+              <button
+                type="button"
+                onClick={generateCaptcha}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Refresh
+              </button>
+            </div>
+            <div className="flex items-center space-x-4 px-4">
+              <div className='my-4 flex items-center'>
+                <input
+                  type="text"
+                  className='text-sm rounded-lg border-2 border-gray-300 bg-white dark:bg-[#101110] text-gray-900 dark:text-[#C4C4C4] focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 p-2 sm:p-2.5 lg:p-3'
+                  value={captchaInput}
+                  onChange={(e) => setCaptchaInput(e.target.value)}
+                  placeholder="Enter captcha"
+                  style={{ padding: "6px", width: "200px" }}
+                />
+                <button
+                  onClick={validateCaptcha}
+                  type='button'
+                  style={{ marginLeft: "10px", padding: "6px 10px" }}
+                  className='text-white rounded-lg bg-gradient-to-r from-green-700 to-green-900'
+                >
+                  Validate
+                </button>
+              </div>
+            </div>
+
+            {captchaError && (
+              <p style={{ color: "red", marginTop: "5px" }}>{captchaError}</p>
+            )}
+
+            {captchaValidated && (
+              <p style={{ color: "green", marginTop: "5px" }}>
+                Captcha validated successfully!
+              </p>
+            )}
+          </div>
+
           {/* Error Display */}
           {error && (
             <p className="text-sm text-red-600 font-medium">
@@ -247,8 +399,8 @@ useEffect(() => {
             )}
           </button>
         </form>
-      </div>
-    </ExamineeCard>
+      </div >
+    </ExamineeCard >
   );
 };
 
