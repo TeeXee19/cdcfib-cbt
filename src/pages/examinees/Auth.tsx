@@ -152,7 +152,7 @@ const Auth = () => {
 
   return (
     <ExamineeCard
-      label="Exam Taker Login"
+      label="Candidate Login"
       question=""
       actionLabel=""
       actionHref="/support"

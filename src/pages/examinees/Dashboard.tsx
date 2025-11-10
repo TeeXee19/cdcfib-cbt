@@ -23,10 +23,10 @@ const ExamInterface = () => {
     const [questions, setQuestions] = useState<any[]>([]);
     const [answers, setAnswers] = useState<Record<any, any>>({});
     // const { mutate: updateExam } = useUpdateExaminee()
-    const [username, setUsername] = useState('')
+    const [username] = useState('')
     const [submitted, setSubmitted] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0);
-    const [_, setExamStartDate] = useState(0);
+    const [_] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showTimerModal, setShowTimerModal] = useState(false);
