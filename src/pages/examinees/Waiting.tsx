@@ -466,12 +466,7 @@ export default function WaitingRoomSecure(): JSX.Element {
     setStage("captured");
     setMessage("Liveness check passed. Waiting for admission...");
     setIsLoading(false);
-    updateExamStatus({ status: 'VERIFIED' })
-    setCandidate(prev => {
-      if (!prev) return prev; // or handle null however you want
-      setItem('examinee', { ...prev, status: 'VERIFIED' })
-      return { ...prev, status: 'VERIFIED' };
-    });
+
 
 
   }
@@ -690,6 +685,12 @@ export default function WaitingRoomSecure(): JSX.Element {
                 onClick={() => {
                   // finalize (simulate upload and wait)
                   setMessage("Submitting verification (simulated)...");
+                  updateExamStatus({ status: 'VERIFIED' })
+                  setCandidate(prev => {
+                    if (!prev) return prev; // or handle null however you want
+                    setItem('examinee', { ...prev, status: 'VERIFIED' })
+                    return { ...prev, status: 'VERIFIED' };
+                  });
                   setTimeout(() => {
                     setMessage("Verification submitted. Please wait to be admitted.");
                     setStage("waiting");
@@ -707,6 +708,7 @@ export default function WaitingRoomSecure(): JSX.Element {
                   setMessage(null);
                   setCapturedImage(null);
                   // setLivenessPercent(null);
+
                   (async () => {
                     const ok = await startCamera();
                     if (ok) setStage("preview");
@@ -737,7 +739,7 @@ export default function WaitingRoomSecure(): JSX.Element {
               <li>8. Do not refresh or close the browser during the exam.</li>
               <li>9. Keep your camera on at all times if prompted for verification.</li>
             </ul>
-            <br/><br/>
+            <br /><br />
             <h2 className="text-lg font-semibold text-gray-700 mb-2">Verified — Awaiting Admission</h2>
             <p className="text-gray-600 mb-4">You will be admitted into the exam by the proctor when ready.</p>
             <div className="flex gap-3">
