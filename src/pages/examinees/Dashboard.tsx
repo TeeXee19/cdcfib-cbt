@@ -45,6 +45,7 @@ const ExamInterface = () => {
 
 
     useEffect(() => {
+        document.documentElement.requestFullscreen?.();
         const savedAnswers = localStorage.getItem("examAnswers");
         const savedPage = localStorage.getItem("examPage");
 
@@ -98,7 +99,6 @@ const ExamInterface = () => {
 
         setExaStarted(true)
         setQuestions(parsedQuestions);
-        document.documentElement.requestFullscreen?.();
         return () => clearInterval(interval);
 
     }, [exam]);
