@@ -586,11 +586,11 @@ export default function WaitingRoomSecure(): JSX.Element {
 
         {stage === "input" && (
           <>
-            <h2 className="text-lg font-semibold text-gray-700 mb-3">Enter Exam Number</h2>
+            <h2 className="text-lg font-semibold text-gray-700 mb-3">Enter Candidate Number</h2>
             <input
               value={examNumber}
               onChange={(e) => setExamNumber(e.target.value)}
-              placeholder="EXM-123456"
+              placeholder="EXM-2025-123456"
               className="w-full p-3 border border-gray-200 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-green-600"
             />
             <div className="flex gap-3">
@@ -601,7 +601,7 @@ export default function WaitingRoomSecure(): JSX.Element {
               >
                 {isLoading ? "Checking..." : "Start Verification"}
               </button>
-              <button
+              {/* <button
                 onClick={() => {
                   // optional camera test
                   (async () => {
@@ -613,7 +613,7 @@ export default function WaitingRoomSecure(): JSX.Element {
                         stopCamera();
                         setMessage(null);
                         setIsLoading(false);
-                      }, 1500);
+                      }, 3000);
                     } else {
                       setIsLoading(false);
                     }
@@ -622,7 +622,7 @@ export default function WaitingRoomSecure(): JSX.Element {
                 className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg"
               >
                 Test Camera
-              </button>
+              </button> */}
             </div>
             {message && <div className="mt-3 text-sm text-red-600">{message}</div>}
             <div className="mt-6 text-xs text-gray-400">We respect your privacy. Camera images are used only for verification.</div>
