@@ -62,7 +62,7 @@ const CompletedPage: React.FC<CompletedPageProps> = ({
                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                         }}
                     >
-                        30/{totalMarks}
+                        {score}/{totalMarks}
                     </Typography>
                     {/* <Typography variant="body1" sx={{ color: '#555', mb: 4 }}>
                         Thank you for completing the exam. You can now exit the portal.
