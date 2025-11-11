@@ -21,7 +21,7 @@ const siteRouter: RouteObject[] = [
     element: <WAITING />,
   },{
     path: "/completed",
-    element: <COMPLETED score={0} />,
+    element: <COMPLETED />,
   },
 
   {
