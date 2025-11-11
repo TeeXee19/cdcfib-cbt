@@ -16,7 +16,7 @@ const CompletedPage: React.FC<CompletedPageProps> = ({
             <nav className="fixed top-0 left-0 right-0 z-50 bg-green-700 text-white shadow-md">
                 <div className="flex justify-between items-center px-6 py-4">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
-                        <span className="font-semibold text-lg">CBT Result </span>
+                        <span className="font-semibold text-lg">CBT Exam Result </span>
                     </div>
                 </div>
             </nav>
