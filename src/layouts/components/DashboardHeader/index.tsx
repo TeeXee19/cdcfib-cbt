@@ -64,12 +64,12 @@ const DashboardHeader = (props: {
           </Link>
         </div>
         <div className="flex flex-col font-satoshi font-bold text-ellipsis overflow-hidden text-[18px] leading-36 text-black dark:text-white">
-          <h3>
+          {/* <h3>
             State: Lagos
           </h3>
           <span>
             Exam Center: 123 - Lagos Island
-          </span>
+          </span> */}
         </div>
         {/* <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
