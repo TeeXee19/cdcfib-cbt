@@ -9,13 +9,22 @@ export interface ApiResponseType {
 export interface DashboardResult {
   totalApplicants:number,
   summary:ExamSectionStat[],
-  totalViolated:number
+  totalViolated:number,
+  scoreDistribution:ScoreDistribution
 }
 export interface ExamSectionStat {
   section: string; // e.g. "09:00AM - 10:00AM"
   status: 'EXAM_ONGOING' | 'EXAM_COMPLETED' | null;
   count: number; // total number of examinees in that section & status
 }
+
+export type ScoreRange = "1-30" | "31-60" | "61-90" | "91-100";
+
+export interface ScoreDistribution {
+  score_range: ScoreRange;
+  total_candidates: string;
+}
+
 
 export interface UserData {
   id: string;

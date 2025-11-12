@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDashboardQuery } from "../../hooks/dashboard.hooks";
 import { useSpring, animated } from "@react-spring/web";
 import ExamDistributionChart from "../../components/compounds/ExamDistributionChart";
+import dayjs from 'dayjs'
+import ExamStatusPieChart from "../../components/compounds/ExamScoreChart";
 
 const AnimatedNumber = ({ value }: { value: number }) => {
   const { number } = useSpring({
@@ -13,11 +15,12 @@ const AnimatedNumber = ({ value }: { value: number }) => {
 };
 
 const ExamSummaryDashboard = () => {
-  const [dayFilter, setDayfilter] = useState('');
-  const { data: summary } = useDashboardQuery(dayFilter);
+
+  const [dayFilter, setDayfilter] = useState<string>();
   // const [selectedDate, setSelectedDate] = useState<string>("All");
   // const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("All");
 
+  const { data: summary } = useDashboardQuery(dayFilter || '');
   const examDates = ["All", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-15", "2025-11-17", "2025-11-18", "2025-11-19"];
   // const timeSlots = [
   //   "All",
@@ -80,6 +83,14 @@ const ExamSummaryDashboard = () => {
     },
   ];
 
+
+
+  useEffect(() => {
+    // Set to today's date in YYYY-MM-DD format
+    const today = dayjs().format("YYYY-MM-DD");
+    setDayfilter(today);
+  }, []);
+
   return (
     <div className="p-6 md:p-10 bg-gray-50 dark:bg-[#101110] min-h-screen">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
@@ -120,7 +131,7 @@ const ExamSummaryDashboard = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-6 mb-10">
         {examStats.map((stat) => (
           <div
             key={stat.label}
@@ -138,8 +149,9 @@ const ExamSummaryDashboard = () => {
       </div>
 
       {/* Chart Section */}
-      <div>
+      <div className="grid grid-cols-2">
         <ExamDistributionChart summary={summary?.summary || []} />
+        <ExamStatusPieChart summary={summary?.scoreDistribution || []} />
       </div>
     </div>
   );

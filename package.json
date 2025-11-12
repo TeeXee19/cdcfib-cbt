@@ -29,6 +29,7 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "country-state-city": "^3.2.1",
+    "dayjs": "^1.11.19",
     "laravel-echo": "^2.2.4",
     "lucide-react": "^0.544.0",
     "multiselect-react-dropdown": "^2.0.25",
