@@ -28,7 +28,7 @@ export async function list(
     }
   );
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -41,7 +41,7 @@ export async function list(
 export async function listByExam(): Promise<ExamineePayload[]> {
   const result = await sendRequest("GET", `${APIs.EXAMINEE}/exam`, "", true);
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -54,7 +54,7 @@ export async function listByExam(): Promise<ExamineePayload[]> {
 export async function create(payload: ExamineePayload) {
   const result = await sendRequest("POST", `${APIs.EXAMINEE}`, payload);
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -75,7 +75,7 @@ export async function upload(file: File) {
     true
   );
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -88,7 +88,7 @@ export async function upload(file: File) {
 export async function view(id: string) {
   const result = await sendRequest("GET", `${APIs.EXAMINEE}/${id}`, {});
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -101,7 +101,7 @@ export async function view(id: string) {
 export async function update(id: string, payload: any) {
   const result = await sendRequest("POST", `${APIs.EXAMINEE}/${id}`, payload, true);
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -114,7 +114,7 @@ export async function update(id: string, payload: any) {
 export async function remove(id: string) {
   const result = await sendRequest("DELETE", `${APIs.EXAMINEE}/${id}`, {});
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -125,7 +125,7 @@ export async function remove(id: string) {
 export async function exam(): Promise<ExamPayload> {
   const result = await sendRequest("GET", `${APIs.EXAMINEE}/exam`, {});
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -135,7 +135,7 @@ export async function exam(): Promise<ExamPayload> {
 export async function submitExam(payload: any) {
   const result = await sendRequest("POST", `answers`, payload, false);
 
-  if (result?.status !== "success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
 

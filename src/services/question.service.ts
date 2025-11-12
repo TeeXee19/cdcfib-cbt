@@ -29,7 +29,7 @@ export async function list(
     }
   );
 
-  if (result?.status !== 'success') {
+  if (result?.statusCode !==  200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -42,7 +42,7 @@ export async function list(
 export async function create(payload: QuestionPayload) {
   const result = await sendRequest("POST", `${APIs.QUESTION}`, payload);
 
-  if (result?.status !== 'success') {
+  if (result?.statusCode !== 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -55,7 +55,7 @@ export async function create(payload: QuestionPayload) {
 export async function view(id: string) {
   const result = await sendRequest("GET", `${APIs.QUESTION}/${id}`, {});
 
-  if (result?.status !== 'success') {
+  if (result?.statusCode !== 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -68,7 +68,7 @@ export async function view(id: string) {
 export async function update(id: string, payload: Partial<QuestionPayload>) {
   const result = await sendRequest("PATCH", `${APIs.QUESTION}/${id}`, payload);
 
-  if (result?.status !== 'success') {
+  if (result?.statusCode !== 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -81,7 +81,7 @@ export async function update(id: string, payload: Partial<QuestionPayload>) {
 export async function remove(id: string) {
   const result = await sendRequest("DELETE", `${APIs.QUESTION}/${id}`, {});
 
-  if (result?.status !== 'success') {
+  if (result?.statusCode !== 200) {
     throw new Error(result?.data ?? result?.message);
   }
 
@@ -97,7 +97,7 @@ export async function bulkUpload(file: File) {
 
   const result = await sendRequest("POST", `${APIs.QUESTION}/bulk-upload`, formData, true);
 
-  if (result?.status !== 'success') {
+  if (result?.statusCode !== 200) {
     throw new Error(result?.data ?? result?.message);
   }
 

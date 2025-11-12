@@ -25,7 +25,7 @@ export async function list(
     }
   );
 
-  if (result?.status !== 'success') {
+  if (result?.statusCode != 200) {
       throw new Error(result?.data ?? result?.message);
     }
     
@@ -37,7 +37,7 @@ export async function list(
 
 export async function create(payload:any) {
     const result = await sendRequest("POST", `${APIs.EXAM}`, payload, true);
-    if (result?.status !== 'success') {
+    if (result?.statusCode != 200) {
         throw new Error(result?.data ?? result?.message);
     }
     return result.data;
@@ -45,14 +45,14 @@ export async function create(payload:any) {
 
 export async function update(payload: any, id: number) {
     const result = await sendRequest("POST", `${APIs.EXAM}/${id}`, payload, true);
-   if (result?.status !== 'success') {
+   if (result?.statusCode != 200) {
         throw new Error(result?.data ?? result?.message);
     }
     return result.data;
 }
 export async function view(id: string) {
     const result = await sendRequest("GET", `${APIs.EXAM}/${id}`, {});
-    if (result?.status !== 'success') {
+    if (result?.statusCode != 200) {
         throw new Error(result?.data ?? result?.message);
     }
     return result.data;
@@ -60,7 +60,7 @@ export async function view(id: string) {
 
 export async function deletRExam(examId: number) {
     const result = await sendRequest("DELETE", `${APIs.EXAM}/${examId}`, {});
-    if (result?.status !== 'success') {
+    if (result?.statusCode != 200) {
         throw new Error(result?.data ?? result?.message);
     }
     return result.data;

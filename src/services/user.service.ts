@@ -27,7 +27,7 @@ export async function list(
         }
     );
 
-    if (result?.status != "Success") {
+    if (result?.statusCode != 200) {
         throw new Error(result?.data ?? result?.message);
     }
     return result.data.items;
@@ -35,7 +35,7 @@ export async function list(
 
 export async function create(payload:InitiateRegistration) {
   const result = await sendRequest("POST", `${APIs.USER}`, payload);
-  if (result?.status != "Success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
   return result.data;
@@ -43,7 +43,7 @@ export async function create(payload:InitiateRegistration) {
 
 export async function update(payload:InitiateRegistration, userId:string) {
   const result = await sendRequest("PATCH", `${APIs.USER}/${userId}`, payload);
-  if (result?.status != "Success") {
+  if (result?.statusCode != 200) {
     throw new Error(result?.data ?? result?.message);
   }
   return result.data;
