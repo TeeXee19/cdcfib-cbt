@@ -7,7 +7,7 @@ const CompletedPage: React.FC = () => {
     const totalMarks = 100;
     const location = useLocation();
     const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
-    const totalAnswerO = location.state.totalAnswerO ?? 0;
+    // const totalAnswerO = location.state.totalAnswerO ?? 0;
     
     localStorage.clear();
     useEffect(() => {
@@ -35,7 +35,7 @@ const CompletedPage: React.FC = () => {
 
                 <div className="border-t border-gray-200 my-4"></div>
 
-                <p className="text-lg font-bold text-black/60 mb-3">{totalAnswerO} questions answered of 40</p>
+                {/* <p className="text-lg font-bold text-black/60 mb-3">{totalAnswerO} questions answered of 40</p> */}
 
                 {loading ? (
                     <div className="flex justify-center items-center py-8">
