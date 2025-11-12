@@ -14,7 +14,7 @@ interface Props {
     summary: ScoreDistribution[];
 }
 
-const COLORS = ['#fee2e2', "#fef9c3", "#dbeafe", "#dcfce7",]; // yellow & blue
+const COLORS = ['#003f5c', "#444e86", "#dd5182", "#ff6e54" ]; // yellow & blue
 
 const ExamStatusPieChart = ({ summary }: Props) => {
     if (!summary || summary.length === 0) {

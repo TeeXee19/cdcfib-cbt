@@ -75,12 +75,12 @@ const ExamSummaryDashboard = () => {
       icon: "🟢",
       color: "bg-yellow-100 text-yellow-800",
     },
-    {
-      label: "Violations",
-      value: summary?.totalViolated,
-      icon: "🟢",
-      color: "bg-red-100 text-black-800",
-    },
+    // {
+    //   label: "Violations",
+    //   value: summary?.totalViolated,
+    //   icon: "🟢",
+    //   color: "bg-red-100 text-black-800",
+    // },
   ];
 
 
@@ -131,7 +131,7 @@ const ExamSummaryDashboard = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-6 mb-10">
         {examStats.map((stat) => (
           <div
             key={stat.label}
