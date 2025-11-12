@@ -10,7 +10,7 @@ export interface DashboardResult {
   totalApplicants:number,
   summary:ExamSectionStat[],
   totalViolated:number,
-  scoreDistribution:ScoreDistribution
+  scoreDistribution:ScoreDistribution[]
 }
 export interface ExamSectionStat {
   section: string; // e.g. "09:00AM - 10:00AM"
