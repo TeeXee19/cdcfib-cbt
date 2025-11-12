@@ -1,7 +1,11 @@
 import React from 'react';
 import { Box, Typography, Container, Paper } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 
 const CompletedPage: React.FC = () => {
+    const location = useLocation();
+    const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
+    const totalAnswereO = location.state.totalAnswereO ?? 0
     return (
         <Container maxWidth="md" className="min-h-screen flex flex-col items-center justify-center ">
             <Box sx={{ mt: 10, mb: 6, display: 'flex', justifyContent: 'center' }}>
@@ -25,7 +29,7 @@ const CompletedPage: React.FC = () => {
                         You may now close this window
                     </Typography>
                     <button className="px-6 py-2 rounded-lg bg-red-600 dark:bg-red-500 text-[32px] text-white dark:text-white disabled:opacity-50 font-bold" onClick={() => window.location.href = '/'}>
-                            Exit
+                        Exit
                     </button>
                 </Paper>
             </Box>

@@ -83,7 +83,7 @@ export interface Question {
   option_c: string;
   option_d: string;
   option_e: string | null;
-  correctOption: string;
+  answer: string;
   marks: number;
   createdAt: string;
   updatedAt: string;

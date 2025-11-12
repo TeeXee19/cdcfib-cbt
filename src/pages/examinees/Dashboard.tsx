@@ -138,97 +138,97 @@ const ExamInterface = () => {
     }, [examStarted, submitted]);
 
 
-        useEffect(() => {
+    useEffect(() => {
         // --- Desktop: right click & keys ---
         const blockRightClick = (e: MouseEvent) => e.preventDefault();
 
         const blockKeys = (e: KeyboardEvent) => {
-          const key = e.key.toUpperCase();
-          if (
-            key === "F12" ||
-            (e.ctrlKey && e.shiftKey && ["I", "J", "C", "K"].includes(key)) ||
-            (e.ctrlKey && ["U", "S", "H"].includes(key)) || // U = view-source, S = save, H = help/inspect
-            (e.metaKey && ["P", "S"].includes(key)) || // mac cmd+P/Cmd+S etc
-            key === "ESC"
-          ) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            return false;
-          }
+            const key = e.key.toUpperCase();
+            if (
+                key === "F12" ||
+                (e.ctrlKey && e.shiftKey && ["I", "J", "C", "K"].includes(key)) ||
+                (e.ctrlKey && ["U", "S", "H"].includes(key)) || // U = view-source, S = save, H = help/inspect
+                (e.metaKey && ["P", "S"].includes(key)) || // mac cmd+P/Cmd+S etc
+                key === "ESC"
+            ) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return false;
+            }
         };
 
         // --- Mobile: block long-press/context menu and gestures ---
         // long-press on touch devices often triggers context menu / image save
         const blockContextMenu = (e: Event) => {
-          const target = e.target as HTMLElement;
-          if (
-          target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.tagName === "SELECT" ||
-          target.tagName === "BUTTON" ||
-          target.isContentEditable
-        ) {
-          return; // allow context actions for form elements
-        }
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
+            const target = e.target as HTMLElement;
+            if (
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.tagName === "SELECT" ||
+                target.tagName === "BUTTON" ||
+                target.isContentEditable
+            ) {
+                return; // allow context actions for form elements
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
         };
 
         // Prevent copy/paste and selection
         const blockCopy = (e: ClipboardEvent) => {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          return false;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return false;
         };
         const blockSelect = (e: Event) => {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          return false;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return false;
         };
 
         // Prevent drag (images/text)
         const blockDrag = (e: DragEvent) => {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          return false;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return false;
         };
 
         // Prevent pinch to zoom / gesturestart (iOS Safari)
         const blockGesture = (e: Event) => {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          return false;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return false;
         };
 
         // Small "devtools open" detector — heuristic
         const detectDevTools = (() => {
-        //   let last = +new Date();
-          return () => {
-            // Heuristic: large difference between outer and inner dims
-            // const threshold = 160;
-            // if (
-            //   (window.outerWidth - window.innerWidth > threshold) ||
-            //   (window.outerHeight - window.innerHeight > threshold)
-            // ) {
-            //   // Action: choose what to do — redirect, blank page, or show overlay
-            //   // Example: navigate away to a safe page
-            //   window.location.href = "about:blank";
-            //   return true;
-            // }
+            //   let last = +new Date();
+            return () => {
+                // Heuristic: large difference between outer and inner dims
+                // const threshold = 160;
+                // if (
+                //   (window.outerWidth - window.innerWidth > threshold) ||
+                //   (window.outerHeight - window.innerHeight > threshold)
+                // ) {
+                //   // Action: choose what to do — redirect, blank page, or show overlay
+                //   // Example: navigate away to a safe page
+                //   window.location.href = "about:blank";
+                //   return true;
+                // }
 
-            // Another heuristic: debugger timing trap
-            const start = performance.now();
-            // eslint-disable-next-line no-debugger
-            debugger;
-            const delta = performance.now() - start;
-            if (delta > 100) {
-              window.location.href = "about:blank";
-              return true;
-            }
-            // last = +new Date();
-            return false;
-          };
+                // Another heuristic: debugger timing trap
+                const start = performance.now();
+                // eslint-disable-next-line no-debugger
+                debugger;
+                const delta = performance.now() - start;
+                if (delta > 100) {
+                    window.location.href = "about:blank";
+                    return true;
+                }
+                // last = +new Date();
+                return false;
+            };
         })();
 
         // Poll interval (low frequency to reduce perf impact)
@@ -240,7 +240,7 @@ const ExamInterface = () => {
 
         // Mobile/touch listeners
         document.addEventListener("touchstart", blockContextMenu, { passive: false });
-        document.addEventListener("touchend", () => {}, { passive: true }); // no-op but keeps touch pipeline predictable
+        document.addEventListener("touchend", () => { }, { passive: true }); // no-op but keeps touch pipeline predictable
         document.addEventListener("gesturestart", blockGesture, { passive: false }); // iOS legacy
         document.addEventListener("copy", blockCopy, true);
         document.addEventListener("cut", blockCopy, true);
@@ -251,28 +251,28 @@ const ExamInterface = () => {
         // Prevent two-finger double-tap / double-tap zoom on some browsers
         let lastTouch = 0;
         const preventDoubleTapZoom = (e: TouchEvent) => {
-          const now = Date.now();
-          if (now - lastTouch <= 300) {
-            e.preventDefault();
-          }
-          lastTouch = now;
+            const now = Date.now();
+            if (now - lastTouch <= 300) {
+                e.preventDefault();
+            }
+            lastTouch = now;
         };
         document.addEventListener("touchend", preventDoubleTapZoom, { passive: false });
 
         return () => {
-          document.removeEventListener("contextmenu", blockRightClick);
-          document.removeEventListener("keydown", blockKeys, true);
-          document.removeEventListener("touchstart", blockContextMenu);
-          document.removeEventListener("gesturestart", blockGesture);
-          document.removeEventListener("copy", blockCopy, true);
-          document.removeEventListener("cut", blockCopy, true);
-          document.removeEventListener("paste", blockCopy, true);
-          document.removeEventListener("selectstart", blockSelect, true);
-          document.removeEventListener("dragstart", blockDrag, true);
-          document.removeEventListener("touchend", preventDoubleTapZoom);
-          clearInterval(detectInterval);
+            document.removeEventListener("contextmenu", blockRightClick);
+            document.removeEventListener("keydown", blockKeys, true);
+            document.removeEventListener("touchstart", blockContextMenu);
+            document.removeEventListener("gesturestart", blockGesture);
+            document.removeEventListener("copy", blockCopy, true);
+            document.removeEventListener("cut", blockCopy, true);
+            document.removeEventListener("paste", blockCopy, true);
+            document.removeEventListener("selectstart", blockSelect, true);
+            document.removeEventListener("dragstart", blockDrag, true);
+            document.removeEventListener("touchend", preventDoubleTapZoom);
+            clearInterval(detectInterval);
         };
-      }, []);
+    }, []);
 
     const handleAnswer = (questionId: string, value: any) => {
         const updated = { ...answers, [questionId]: value };
@@ -323,11 +323,34 @@ const ExamInterface = () => {
 
         await submitExam(feedback)
         await updateExamStatus({ status: 'EXAM_COMPLETED' })
+        let totalScore = 0;
+        const questions = exam?.questions
+        await Promise.all(questions?.map(q => {
+            if (q.id in answers) {
+                if (answers[q.id] === q.option_a && q.answer === 'A') {
+                    totalScore += q.marks;
+                } else if (answers[q.id] === q.option_b && q.answer === 'B') {
+                    totalScore += q.marks;
+                } else if (answers[q.id] === q.option_c && q.answer === 'C') {
+                    totalScore += q.marks;
+                } else if (answers[q.id] === q.option_d && q.answer === 'D') {
+                    totalScore += q.marks;
+                }
+            }
+
+            return 0
+        }) || [])
+
         // localStorage.removeItem("examAnswers");
         // localStorage.removeItem("examPage");
         // localStorage.clear();
 
-        navigate('/completed')
+        navigate('/completed', {
+            state: {
+                totalScore: totalScore,
+                totalAnswereO: Object.keys(answers).length
+            }
+        })
     };
 
     // useEffect(() => {
