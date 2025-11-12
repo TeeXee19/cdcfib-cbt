@@ -321,10 +321,8 @@ const ExamInterface = () => {
 
 
 
-        await submitExam(feedback)
-        await updateExamStatus({ status: 'EXAM_COMPLETED' })
         let totalScore: number = 0;
-        let totalAnswer:number = 0
+        let totalAnswer: number = 0
         const questions = exam?.questions
         await Promise.all(questions?.map(q => {
             if (q.id in answers) {
@@ -346,11 +344,13 @@ const ExamInterface = () => {
         // localStorage.removeItem("examAnswers");
         // localStorage.removeItem("examPage");
         // localStorage.clear();
+        await submitExam(feedback)
+        await updateExamStatus({ status: 'EXAM_COMPLETED', score: totalScore })
 
         navigate('/completed', {
             state: {
                 totalScore: totalScore,
-                totalAnswereO: totalAnswer
+                totalAnswer: totalAnswer
             }
         })
     };
