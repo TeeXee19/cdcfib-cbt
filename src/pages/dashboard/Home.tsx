@@ -72,6 +72,12 @@ const ExamSummaryDashboard = () => {
       icon: "🟢",
       color: "bg-yellow-100 text-yellow-800",
     },
+    {
+      label: "Violations",
+      value: summary?.totalViolated,
+      icon: "🟢",
+      color: "bg-red-100 text-black-800",
+    },
   ];
 
   return (
@@ -96,7 +102,7 @@ const ExamSummaryDashboard = () => {
             ))}
           </select>
         </div>
-{/* 
+        {/* 
         <div>
           <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
             Time Slot

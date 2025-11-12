@@ -8,7 +8,8 @@ export interface ApiResponseType {
 
 export interface DashboardResult {
   totalApplicants:number,
-  summary:ExamSectionStat[]
+  summary:ExamSectionStat[],
+  totalViolated:number
 }
 export interface ExamSectionStat {
   section: string; // e.g. "09:00AM - 10:00AM"
