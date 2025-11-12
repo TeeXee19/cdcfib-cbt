@@ -323,18 +323,20 @@ const ExamInterface = () => {
 
         await submitExam(feedback)
         await updateExamStatus({ status: 'EXAM_COMPLETED' })
-        let totalScore = 0;
+        let totalScore: number = 0;
+        let totalAnswer:number = 0
         const questions = exam?.questions
         await Promise.all(questions?.map(q => {
             if (q.id in answers) {
+                totalAnswer = totalAnswer + 1
                 if (answers[q.id] === q.option_a && q.answer === 'A') {
-                    totalScore += +q.marks;
+                    totalScore = Number(totalScore) + Number(q.marks);
                 } else if (answers[q.id] === q.option_b && q.answer === 'B') {
-                    totalScore += +q.marks;
+                    totalScore = Number(totalScore) + Number(q.marks);
                 } else if (answers[q.id] === q.option_c && q.answer === 'C') {
-                    totalScore += +q.marks;
+                    totalScore = Number(totalScore) + Number(q.marks);
                 } else if (answers[q.id] === q.option_d && q.answer === 'D') {
-                    totalScore += +q.marks;
+                    totalScore = Number(totalScore) + Number(q.marks);
                 }
             }
 
@@ -348,7 +350,7 @@ const ExamInterface = () => {
         navigate('/completed', {
             state: {
                 totalScore: totalScore,
-                totalAnswereO: Object.keys(answers).length
+                totalAnswereO: totalAnswer
             }
         })
     };
