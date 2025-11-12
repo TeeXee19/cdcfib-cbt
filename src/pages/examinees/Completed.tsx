@@ -7,7 +7,7 @@ const CompletedPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const totalMarks = 100;
     const location = useLocation()
-        const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
+    const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
     const totalAnswereO = location.state.totalAnswereO ?? 0
 
     useEffect(() => {

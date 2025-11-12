@@ -328,13 +328,13 @@ const ExamInterface = () => {
         await Promise.all(questions?.map(q => {
             if (q.id in answers) {
                 if (answers[q.id] === q.option_a && q.answer === 'A') {
-                    totalScore += q.marks;
+                    totalScore += +q.marks;
                 } else if (answers[q.id] === q.option_b && q.answer === 'B') {
-                    totalScore += q.marks;
+                    totalScore += +q.marks;
                 } else if (answers[q.id] === q.option_c && q.answer === 'C') {
-                    totalScore += q.marks;
+                    totalScore += +q.marks;
                 } else if (answers[q.id] === q.option_d && q.answer === 'D') {
-                    totalScore += q.marks;
+                    totalScore += +q.marks;
                 }
             }
 

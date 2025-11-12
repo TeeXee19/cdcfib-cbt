@@ -641,7 +641,7 @@ export default function WaitingRoomSecure(): JSX.Element {
     const interval = setInterval(() => {
       const now = dayjs();
       const diff = examDateTime.diff(now, 'minutes');
-      console.log(diff)
+      // console.log(diff)
       if (!candidateNumberVerified) {
         setMessage("Candidate Number not verified yet.");
         // alert('You have not verified your candidate number')
