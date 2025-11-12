@@ -13,7 +13,7 @@ const AnimatedNumber = ({ value }: { value: number }) => {
 };
 
 const ExamSummaryDashboard = () => {
-  const [dayFilter, setDayfilter] = useState("2025-11-11");
+  const [dayFilter, setDayfilter] = useState('');
   const { data: summary } = useDashboardQuery(dayFilter);
   // const [selectedDate, setSelectedDate] = useState<string>("All");
   // const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("All");
