@@ -174,9 +174,8 @@ export default function WaitingRoomSecure(): JSX.Element {
 
 
 
-    useEffect(() => {
-
-    
+  useEffect(() => {
+   
     // --- Desktop: right click & keys ---
     const blockRightClick = (e: MouseEvent) => e.preventDefault();
 
