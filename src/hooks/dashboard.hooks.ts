@@ -6,6 +6,7 @@ export function useDashboardQuery(date: string) {
   return useQuery({
     queryKey: ["dashboard", "cardCounts"],
     queryFn: () => dashboard(date),
-    enabled: !!date
+    enabled: !!date,
+    refetchInterval: 30000, // refetch every 5 seconds
   });
 }
