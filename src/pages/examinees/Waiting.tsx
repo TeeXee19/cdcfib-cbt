@@ -174,41 +174,141 @@ export default function WaitingRoomSecure(): JSX.Element {
 
 
 
-  // anti-inspect and right-click (permissive for form input focus)
-  useEffect(() => {
-    const blockContext = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      // allow if clicking inputs or inside forms
-      if (t && (t.closest("input") || t.closest("textarea") || t.closest("form") || t.tagName === "INPUT")) {
-        return;
-      }
-      e.preventDefault();
-    };
+    useEffect(() => {
+
+    
+    // --- Desktop: right click & keys ---
+    const blockRightClick = (e: MouseEvent) => e.preventDefault();
+
     const blockKeys = (e: KeyboardEvent) => {
       const key = e.key.toUpperCase();
-      if (key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(key)) || (e.ctrlKey && key === "U")) {
+      if (
+        key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I", "J", "C", "K"].includes(key)) ||
+        (e.ctrlKey && ["U", "S", "H"].includes(key)) || // U = view-source, S = save, H = help/inspect
+        (e.metaKey && ["P", "S"].includes(key)) || // mac cmd+P/Cmd+S etc
+        key === "ESC"
+      ) {
         e.preventDefault();
-        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
       }
     };
 
-    document.addEventListener("contextmenu", blockContext);
+    // --- Mobile: block long-press/context menu and gestures ---
+    // long-press on touch devices often triggers context menu / image save
+    const blockContextMenu = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.tagName === "BUTTON" ||
+        target.isContentEditable
+      ) {
+        return; // allow context actions for form elements
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
+
+    // Prevent copy/paste and selection
+    const blockCopy = (e: ClipboardEvent) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return false;
+    };
+    const blockSelect = (e: Event) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return false;
+    };
+
+    // Prevent drag (images/text)
+    const blockDrag = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return false;
+    };
+
+    // Prevent pinch to zoom / gesturestart (iOS Safari)
+    const blockGesture = (e: Event) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return false;
+    };
+
+    // Small "devtools open" detector — heuristic
+    const detectDevTools = (() => {
+      // let last = +new Date();
+      return () => {
+        // Heuristic: large difference between outer and inner dims
+        // const threshold = 160;
+        // if (
+        //   (window.outerWidth - window.innerWidth > threshold) ||
+        //   (window.outerHeight - window.innerHeight > threshold)
+        // ) {
+        //   // Action: choose what to do — redirect, blank page, or show overlay
+        //   // Example: navigate away to a safe page
+        //   window.location.href = "about:blank";
+        //   return true;
+        // }
+
+        // Another heuristic: debugger timing trap
+        const start = performance.now();
+        // eslint-disable-next-line no-debugger
+        debugger;
+        const delta = performance.now() - start;
+        if (delta > 100) {
+          window.location.href = "about:blank";
+          return true;
+        }
+        // last = +new Date();
+        return false;
+      };
+    })();
+
+    // Poll interval (low frequency to reduce perf impact)
+    const detectInterval = window.setInterval(detectDevTools, 1500);
+
+    // Attach listeners
+    document.addEventListener("contextmenu", blockRightClick);
     document.addEventListener("keydown", blockKeys, true);
 
-    // detect devtools by viewport difference (heuristic)
-    const devtoolsChecker = setInterval(() => {
-      const threshold = 160;
-      if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-        // gentle: show message, then reload to break inspection
-        setMessage("Please close developer tools to continue.");
-        setTimeout(() => window.location.reload(), 1400);
+    // Mobile/touch listeners
+    document.addEventListener("touchstart", blockContextMenu, { passive: false });
+    document.addEventListener("touchend", () => { }, { passive: true }); // no-op but keeps touch pipeline predictable
+    document.addEventListener("gesturestart", blockGesture, { passive: false }); // iOS legacy
+    document.addEventListener("copy", blockCopy, true);
+    document.addEventListener("cut", blockCopy, true);
+    document.addEventListener("paste", blockCopy, true);
+    document.addEventListener("selectstart", blockSelect, true);
+    document.addEventListener("dragstart", blockDrag, true);
+
+    // Prevent two-finger double-tap / double-tap zoom on some browsers
+    let lastTouch = 0;
+    const preventDoubleTapZoom = (e: TouchEvent) => {
+      const now = Date.now();
+      if (now - lastTouch <= 300) {
+        e.preventDefault();
       }
-    }, 1500);
+      lastTouch = now;
+    };
+    document.addEventListener("touchend", preventDoubleTapZoom, { passive: false });
 
     return () => {
-      document.removeEventListener("contextmenu", blockContext);
+      document.removeEventListener("contextmenu", blockRightClick);
       document.removeEventListener("keydown", blockKeys, true);
-      clearInterval(devtoolsChecker);
+      document.removeEventListener("touchstart", blockContextMenu);
+      document.removeEventListener("gesturestart", blockGesture);
+      document.removeEventListener("copy", blockCopy, true);
+      document.removeEventListener("cut", blockCopy, true);
+      document.removeEventListener("paste", blockCopy, true);
+      document.removeEventListener("selectstart", blockSelect, true);
+      document.removeEventListener("dragstart", blockDrag, true);
+      document.removeEventListener("touchend", preventDoubleTapZoom);
+      clearInterval(detectInterval);
     };
   }, []);
 
@@ -586,11 +686,11 @@ export default function WaitingRoomSecure(): JSX.Element {
 
         {stage === "input" && (
           <>
-            <h2 className="text-lg font-semibold text-gray-700 mb-3">Enter Exam Number</h2>
+            <h2 className="text-lg font-semibold text-gray-700 mb-3">Enter Candidate Number</h2>
             <input
               value={examNumber}
               onChange={(e) => setExamNumber(e.target.value)}
-              placeholder="EXM-123456"
+              placeholder="EXM-2025-123456"
               className="w-full p-3 border border-gray-200 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-green-600"
             />
             <div className="flex gap-3">
@@ -601,7 +701,7 @@ export default function WaitingRoomSecure(): JSX.Element {
               >
                 {isLoading ? "Checking..." : "Start Verification"}
               </button>
-              <button
+              {/* <button
                 onClick={() => {
                   // optional camera test
                   (async () => {
@@ -613,7 +713,7 @@ export default function WaitingRoomSecure(): JSX.Element {
                         stopCamera();
                         setMessage(null);
                         setIsLoading(false);
-                      }, 1500);
+                      }, 3000);
                     } else {
                       setIsLoading(false);
                     }
@@ -622,7 +722,7 @@ export default function WaitingRoomSecure(): JSX.Element {
                 className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg"
               >
                 Test Camera
-              </button>
+              </button> */}
             </div>
             {message && <div className="mt-3 text-sm text-red-600">{message}</div>}
             <div className="mt-6 text-xs text-gray-400">We respect your privacy. Camera images are used only for verification.</div>
