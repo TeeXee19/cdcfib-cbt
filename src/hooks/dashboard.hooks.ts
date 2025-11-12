@@ -6,5 +6,6 @@ export function useDashboardQuery(date: string) {
   return useQuery({
     queryKey: ["dashboard", "cardCounts"],
     queryFn: () => dashboard(date),
+    enabled: !!date
   });
 }
