@@ -3,21 +3,22 @@ import Logo from "@/assets/logo.png";
 import { useLocation } from "react-router-dom";
 
 const CompletedPage: React.FC = () => {
-    const [score, setScore] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const totalMarks = 100;
-    const location = useLocation()
-        const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
-    const totalAnswereO = location.state.totalAnswereO ?? 0
-
+    const location = useLocation();
+    const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
+    const totalAnswerO = location.state.totalAnswerO ?? 0;
+    
+    localStorage.clear();
     useEffect(() => {
-        // Simulate API call
-        setTimeout(() => {
-            setScore(72); // change to test
+        // Simulate loading time
+        
+        const timer = setTimeout(() => {
             setLoading(false);
-        }, 1500);
-    }, []);
+        }, 1000); // 1 second delay
 
+        return () => clearTimeout(timer);
+    }, []);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-green-100 px-4">
@@ -34,7 +35,7 @@ const CompletedPage: React.FC = () => {
 
                 <div className="border-t border-gray-200 my-4"></div>
 
-                <p className="text-lg font-medium text-gray-700 mb-3">Your Score</p>
+                <p className="text-lg font-bold text-black/60 mb-3">{totalAnswerO} questions answered of 40</p>
 
                 {loading ? (
                     <div className="flex justify-center items-center py-8">
@@ -46,7 +47,7 @@ const CompletedPage: React.FC = () => {
                         style={{ borderWidth: "2px", borderColor: "green" }}
                     >
                         <span>
-                            {score} / {totalMarks}
+                            {totalScore} / {totalMarks}
                         </span>
                     </div>
                 )}
