@@ -22,6 +22,8 @@ const ExamStatusPieChart = ({ summary }: Props) => {
     }
 
     // Aggregate totals for each status
+
+    const totalScore = summary.reduce((sum, s) => sum + +s.total_candidates, 0);
     const firstCat = summary
         .filter((s) => s.score_range === '1-30')
         .reduce((sum, s) => sum + +s.total_candidates, 0);
@@ -39,10 +41,10 @@ const ExamStatusPieChart = ({ summary }: Props) => {
         .reduce((sum, s) => sum + +s.total_candidates, 0);
 
     const data = [
-        { name: '0-30', value: firstCat },
-        { name: "31-60", value: secondCat },
-        { name: "61-90", value: thirdCat },
-        { name: "91-100", value: fourthCat },
+        { name: '0-30', value: Number(((firstCat / totalScore) * 100).toFixed(2)) },
+        { name: '31-60', value: Number(((secondCat / totalScore) * 100).toFixed(2)) },
+        { name: '61-90', value: Number(((thirdCat / totalScore) * 100).toFixed(2)) },
+        { name: '91-100', value: Number(((fourthCat / totalScore) * 100).toFixed(2)) },
     ];
 
     return (
@@ -57,20 +59,20 @@ const ExamStatusPieChart = ({ summary }: Props) => {
                         data={data}
                         cx="50%"
                         cy="50%"
-                        labelLine={false}
+                        labelLine={true}
                         // label={({ name, percent }: { name: PieLabel | undefined; percent: number }) =>
                         //     `${name}: ${(percent * 100).toFixed(0)}%`
                         // }
                         outerRadius={150}
                         fill="#8884d8"
-                        dataKey="value"
+                        dataKey='value'
                     >
                         {data.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>
 
-                    <Tooltip formatter={(value: number) => `${value} candidates`} />
+                    <Tooltip formatter={(value: number) => `${value}% candidates`} />
                     <Legend />
                 </PieChart>
             </ResponsiveContainer>
