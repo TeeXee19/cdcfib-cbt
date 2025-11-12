@@ -1,0 +1,6 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Redirect to index.html for all routes, allowing React Router to handle routing
+RewriteRule ^$ /index.html [L]
+RewriteRule ^([^.]+)$ /index.html [L]
