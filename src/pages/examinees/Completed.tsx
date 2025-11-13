@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
 import Logo from "@/assets/logo.png";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 
 const CompletedPage: React.FC = () => {
-    const [loading, setLoading] = useState<boolean>(true);
-    const totalMarks = 100;
-    const location = useLocation();
-    const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
+    // const [loading, setLoading] = useState<boolean>(true);
+    // const totalMarks = 100;
+    // const location = useLocation();
+    // const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
     // const totalAnswerO = location.state.totalAnswerO ?? 0;
     
     localStorage.clear();
-    useEffect(() => {
-        // Simulate loading time
+    // useEffect(() => {
+    //     // Simulate loading time
         
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 1000); // 1 second delay
+    //     const timer = setTimeout(() => {
+    //         setLoading(false);
+    //     }, 1000); // 1 second delay
 
-        return () => clearTimeout(timer);
-    }, []);
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-green-100 px-4">
@@ -37,7 +37,7 @@ const CompletedPage: React.FC = () => {
 
                 {/* <p className="text-lg font-bold text-black/60 mb-3">{totalAnswerO} questions answered of 40</p> */}
 
-                {loading ? (
+                {/* {loading ? (
                     <div className="flex justify-center items-center py-8">
                         <div className="w-10 h-10 border-4 border-green-400 border-t-transparent rounded-full animate-spin"></div>
                     </div>
@@ -50,7 +50,7 @@ const CompletedPage: React.FC = () => {
                             {totalScore} / {totalMarks}
                         </span>
                     </div>
-                )}
+                )} */}
 
                 <button
                     onClick={() => (window.location.href = "/")}
