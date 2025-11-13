@@ -9,7 +9,7 @@ const CompletedPage: React.FC = () => {
     // const totalScore = location.state?.totalScore ?? 0; // fallback to 0 if state is undefined
     // const totalAnswerO = location.state.totalAnswerO ?? 0;
     
-    localStorage.clear();
+    // localStorage.clear();
     // useEffect(() => {
     //     // Simulate loading time
         
